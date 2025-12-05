@@ -1,0 +1,53 @@
+{
+  "name": "FitnessPro+",
+  "short_name": "FitnessPro",
+  "description": "Ваш персональный фитнес-помощник с 30 тренировками, таймерами и полным планом питания",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#007AFF",
+  "theme_color": "#007AFF",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/96/000000/weightlift.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "https://img.icons8.com/color/192/000000/weightlift.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://img.icons8.com/color/512/000000/weightlift.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Начать тренировку",
+      "short_name": "Тренировка",
+      "description": "Быстрый старт тренировки с таймером",
+      "url": "./index.html?screen=workouts"
+    },
+    {
+      "name": "План питания",
+      "short_name": "Питание",
+      "description": "Открыть план питания на неделю",
+      "url": "./index.html?screen=nutrition"
+    },
+    {
+      "name": "Дневник тренировок",
+      "short_name": "Дневник",
+      "description": "Открыть дневник тренировок",
+      "url": "./index.html?screen=diary"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "scope": "./",
+  "lang": "ru",
+  "dir": "ltr"
+}

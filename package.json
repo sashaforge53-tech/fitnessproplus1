@@ -1,0 +1,24 @@
+[file name]: package.json
+{
+  "name": "fitnesspro-plus",
+  "version": "1.0.0",
+  "description": "FitnessPro+ - Полный фитнес-помощник для Android",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "build": "echo 'Build complete!'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "fitness",
+    "workout",
+    "nutrition",
+    "pwa",
+    "android"
+  ],
+  "author": "FitnessPro Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}

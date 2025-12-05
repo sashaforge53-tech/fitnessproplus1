@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitnessPro+ - Ваш фитнес-помощник</title>
+    
+    <!-- PWA мета-теги -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FitnessPro+">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#007AFF">
+    
+    <!-- Иконки -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/96/000000/weightlift.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/000000/weightlift.png">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('Service Worker зарегистрирован');
+                    })
+                    .catch(err => {
+                        console.log('Ошибка регистрации Service Worker:', err);
+                    });
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Кнопка Назад (глобальная) -->
+    <button class="btn-back" onclick="goBack()" style="display: none;">
+        <i class="fas fa-arrow-left"></i>
+        <span>Назад</span>
+    </button>
+
+    <!-- Экран настройки профиля -->
+    <div id="profile-setup-screen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-emoji">👤</div>
+            <h1 class="auth-title">Создайте профиль</h1>
+            <p class="auth-subtitle">Расскажите о себе для персонализации</p>
+            
+            <input type="text" id="profile-name-input" class="form-input" placeholder="Ваше имя" required>
+            
+            <div class="form-row">
+                <input type="number" id="profile-age-input" class="form-input" placeholder="Возраст" min="10" max="100" required>
+                <select id="profile-gender-input" class="form-select" required>
+                    <option value="">Пол</option>
+                    <option value="male">Мужской</option>
+                    <option value="female">Женский</option>
+                </select>
+            </div>
+            
+            <div class="form-row">
+                <input type="number" id="profile-weight-input" class="form-input" placeholder="Вес, кг" min="30" max="250" required>
+                <input type="number" id="profile-height-input" class="form-input" placeholder="Рост, см" min="100" max="250" required>
+            </div>
+            
+            <select id="profile-goal-input" class="form-select" required>
+                <option value="">Цель тренировок</option>
+                <option value="weight_loss">Похудение</option>
+                <option value="muscle_gain">Набор мышечной массы</option>
+                <option value="maintenance">Поддержание формы</option>
+                <option value="endurance">Развитие выносливости</option>
+                <option value="strength">Развитие силы</option>
+            </select>
+            
+            <button class="btn-primary" onclick="saveProfile()">
+                <i class="fas fa-check"></i> Сохранить профиль
+            </button>
+            
+            <div class="demo-info" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px; text-align: center;">
+                <p style="margin-bottom: 5px;"><strong>Все данные сохраняются локально</strong></p>
+                <p style="font-size: 0.9em; color: #666;">Вы можете изменить профиль в любое время</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главный экран -->
+    <div id="home-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-dumbbell"></i> FitnessPro+</h1>
+                    <p>Привет, <span id="user-name">Имя</span>! <span id="streak-count">🔥0</span></p>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="today-activity">0</div>
+                    <div class="stat-label">минут</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="today-calories">0</div>
+                    <div class="stat-label">ккал</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="today-water">0</div>
+                    <div class="stat-label">стаканов</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Виджет воды -->
+            <div class="water-widget">
+                <div class="widget-header">
+                    <h2><i class="fas fa-tint"></i> Водный баланс</h2>
+                    <span class="water-drop">💧</span>
+                </div>
+                <div class="water-progress">
+                    <div class="water-fill" id="water-fill" style="width: 0%"></div>
+                </div>
+                <div class="water-info">
+                    <span id="water-current">0 / 8 стаканов</span>
+                    <span>Цель: 2.5л</span>
+                </div>
+                <div class="water-controls">
+                    <button class="btn-water" onclick="addWater(0.5)">+0.5</button>
+                    <button class="btn-water" onclick="addWater(1)">+1 стакан</button>
+                    <button class="btn-water btn-reset" onclick="resetWater()">Сбросить</button>
+                </div>
+            </div>
+            
+            <!-- Быстрый старт -->
+            <div class="quick-actions">
+                <h2 class="section-title"><i class="fas fa-bolt"></i> Быстрый старт</h2>
+                <div class="action-grid">
+                    <div class="action-card" onclick="showScreen('workouts')">
+                        <div class="action-icon" style="background: #007AFF;">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h3>32 тренировки</h3>
+                        <p>С таймерами и отдыхом</p>
+                    </div>
+                    <div class="action-card" onclick="showScreen('nutrition')">
+                        <div class="action-icon" style="background: #4CD964;">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3>Питание</h3>
+                        <p>План на 7 дней + рецепты</p>
+                    </div>
+                    <div class="action-card" onclick="showScreen('diary')">
+                        <div class="action-icon" style="background: #FF9500;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Дневник</h3>
+                        <p>Ваши тренировки</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Сегодняшний план -->
+            <div class="today-plan">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-day"></i> Сегодняшний план</h2>
+                    <span class="date" id="current-date"></span>
+                </div>
+                <div class="plan-content" id="today-plan">
+                    <!-- Динамически загрузится -->
+                </div>
+            </div>
+            
+            <!-- Рекомендации -->
+            <div class="recommendations">
+                <h2 class="section-title"><i class="fas fa-fire"></i> Рекомендуемые тренировки</h2>
+                <div class="recommendation-list" id="recommended-workouts">
+                    <!-- Динамически загрузится -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Навигация -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="showScreen('home'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showScreen('workouts'); return false;">
+                <i class="fas fa-dumbbell"></i>
+                <span>Тренировки</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showScreen('diary'); return false;">
+                <i class="fas fa-book"></i>
+                <span>Дневник</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showScreen('progress'); return false;">
+                <i class="fas fa-chart-line"></i>
+                <span>Прогресс</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showScreen('profile'); return false;">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Экран тренировок -->
+    <div id="workouts-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-dumbbell"></i> 32 тренировки</h1>
+                    <p>С таймерами и отдыхом между подходами</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Фильтры тренировок -->
+            <div class="workout-filters">
+                <button class="filter-btn active" onclick="loadWorkoutsList('all')">Все (32)</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('home')">Домашние (5)</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('gym')">Зал (2)</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('cardio')">Кардио (2)</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('rest')">Отдых (2)</button>
+            </div>
+            
+            <!-- Список тренировок -->
+            <div class="workout-list" id="workout-list">
+                <!-- Динамически загрузится -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран таймера тренировки -->
+    <div id="workout-timer-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-clock"></i> Таймер тренировки</h1>
+                    <p>Следите за временем упражнений и отдыха</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="workout-timer-content">
+                <!-- Динамически загрузится -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран дневника тренировок -->
+    <div id="diary-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-book"></i> Дневник тренировок</h1>
+                    <p>Записывайте свои тренировки</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div style="margin-bottom: 20px;">
+                <button class="btn-primary" onclick="showAddWorkoutModal()" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Добавить тренировку
+                </button>
+            </div>
+            
+            <!-- История тренировок -->
+            <div id="diary-workouts">
+                <h3 class="section-title"><i class="fas fa-history"></i> История тренировок</h3>
+                <div id="workout-history" style="background: white; border-radius: 20px; padding: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+                    <!-- История загрузится динамически -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран питания -->
+    <div id="nutrition-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-utensils"></i> Питание</h1>
+                    <p>План питания на неделю и рецепты</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Навигация по питанию -->
+            <div class="nutrition-nav">
+                <button class="nutrition-tab active" onclick="showNutritionTab('week')">Неделя</button>
+                <button class="nutrition-tab" onclick="showNutritionTab('recipes')">Рецепты</button>
+                <button class="nutrition-tab" onclick="showNutritionTab('calculator')">Калькулятор БЖУ</button>
+            </div>
+            
+            <!-- Контент питания -->
+            <div class="nutrition-content">
+                <!-- План на неделю -->
+                <div id="week-plan" class="nutrition-tab-content active">
+                    <div class="week-days">
+                        <button class="day-btn active" onclick="showDayMeals('monday')">Пн</button>
+                        <button class="day-btn" onclick="showDayMeals('tuesday')">Вт</button>
+                        <button class="day-btn" onclick="showDayMeals('wednesday')">Ср</button>
+                        <button class="day-btn" onclick="showDayMeals('thursday')">Чт</button>
+                        <button class="day-btn" onclick="showDayMeals('friday')">Пт</button>
+                        <button class="day-btn" onclick="showDayMeals('saturday')">Сб</button>
+                        <button class="day-btn" onclick="showDayMeals('sunday')">Вс</button>
+                    </div>
+                    
+                    <div id="day-meals">
+                        <!-- Меню дня загрузится динамически -->
+                    </div>
+                </div>
+                
+                <!-- Рецепты -->
+                <div id="recipes-tab" class="nutrition-tab-content">
+                    <div class="recipes-container" id="recipes-container">
+                        <!-- Рецепты загрузятся динамически -->
+                    </div>
+                </div>
+                
+                <!-- Калькулятор БЖУ -->
+                <div id="bju-calculator" class="nutrition-tab-content">
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-calculator"></i> Калькулятор БЖУ</h3>
+                        <input type="number" id="calories-input" class="form-input" placeholder="Калорий в день" value="2000">
+                        <select id="bju-goal" class="form-select">
+                            <option value="weight_loss">Похудение</option>
+                            <option value="maintenance">Поддержание</option>
+                            <option value="muscle_gain">Набор массы</option>
+                        </select>
+                        <button class="btn-primary" onclick="calculateBJU()">Рассчитать БЖУ</button>
+                        <div id="bju-result" class="result-card" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран калькулятора -->
+    <div id="calculator-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-calculator"></i> Калькулятор</h1>
+                    <p>Рассчитайте ваши нормы</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="calculator-card">
+                <h2><i class="fas fa-fire"></i> Калькулятор калорий</h2>
+                
+                <div class="gender-select">
+                    <button class="gender-btn active" onclick="selectGender('male')">Мужчина</button>
+                    <button class="gender-btn" onclick="selectGender('female')">Женщина</button>
+                </div>
+                
+                <div class="form-row">
+                    <input type="number" id="calc-age" class="form-input" placeholder="Возраст" value="25">
+                    <input type="number" id="calc-height" class="form-input" placeholder="Рост, см" value="175">
+                </div>
+                
+                <input type="number" id="calc-weight" class="form-input" placeholder="Вес, кг" value="70">
+                
+                <select id="calc-activity" class="form-select">
+                    <option value="1.2">Сидячий образ жизни</option>
+                    <option value="1.375">Легкая активность (1-3 тренировки)</option>
+                    <option value="1.55" selected>Умеренная активность (3-5 тренировок)</option>
+                    <option value="1.725">Высокая активность (6-7 тренировок)</option>
+                    <option value="1.9">Экстремальная активность</option>
+                </select>
+                
+                <select id="calc-goal" class="form-select">
+                    <option value="loss">Похудение (-20%)</option>
+                    <option value="maintenance">Поддержание веса</option>
+                    <option value="gain">Набор массы (+20%)</option>
+                </select>
+                
+                <button class="btn-primary" onclick="calculateCalories()">Рассчитать калории</button>
+                
+                <div id="calorie-result" class="result-card" style="display: none;"></div>
+            </div>
+            
+            <div class="history-card">
+                <h3><i class="fas fa-history"></i> История расчетов</h3>
+                <div id="calculation-history"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран прогресса -->
+    <div id="progress-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-chart-line"></i> Прогресс</h1>
+                    <p>Ваша статистика и достижения</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #007AFF;">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="total-workouts">0</div>
+                        <div class="stat-label">тренировок</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #4CD964;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="total-hours">0</div>
+                        <div class="stat-label">часов</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #FF9500;">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="total-calories-burned">0</div>
+                        <div class="stat-label">ккал сожжено</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #FF3B30;">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="current-streak">0</div>
+                        <div class="stat-label">дней подряд</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-chart">
+                <h3><i class="fas fa-chart-bar"></i> Активность за неделю</h3>
+                <div class="chart-container">
+                    <div id="activity-chart" class="chart"></div>
+                </div>
+            </div>
+            
+            <div class="achievements">
+                <h3><i class="fas fa-trophy"></i> Достижения</h3>
+                <div class="achievement-list" id="achievement-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран профиля -->
+    <div id="profile-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-user"></i> Профиль</h1>
+                    <p>Ваши данные и настройки</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar">
+                        <span id="profile-initials">И</span>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Имя пользователя</h2>
+                        <p id="profile-goal">Цель не указана</p>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-birthday-cake"></i> Возраст</span>
+                        <span class="detail-value" id="profile-age">Не указан</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-venus-mars"></i> Пол</span>
+                        <span class="detail-value" id="profile-gender">Не указан</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-weight"></i> Вес</span>
+                        <span class="detail-value" id="profile-weight">Не указан</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-ruler-vertical"></i> Рост</span>
+                        <span class="detail-value" id="profile-height">Не указан</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3><i class="fas fa-cog"></i> Настройки</h3>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Уведомления</h4>
+                        <p>Напоминания о тренировках</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="notifications-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Темная тема</h4>
+                        <p>Автоматическое переключение</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="darkmode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Напоминания о воде</h4>
+                        <p>Каждые 2 часа</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="water-reminders" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="btn-secondary" onclick="showScreen('profile-edit')" style="margin-bottom: 15px;">
+                <i class="fas fa-edit"></i> Редактировать профиль
+            </button>
+            
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Сбросить профиль
+            </button>
+        </div>
+    </div>
+
+    <!-- Экран редактирования профиля -->
+    <div id="profile-edit-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div>
+                        <h1><i class="fas fa-user-edit"></i> Редактирование профиля</h1>
+                        <p>Обновите ваши данные</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="profile-edit-card">
+                <input type="text" id="edit-name" class="form-input" placeholder="Ваше имя" required>
+                
+                <div class="form-row">
+                    <input type="number" id="edit-age" class="form-input" placeholder="Возраст" min="10" max="100" required>
+                    <select id="edit-gender" class="form-select" required>
+                        <option value="">Пол</option>
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <input type="number" id="edit-weight" class="form-input" placeholder="Вес, кг" min="30" max="250" required>
+                    <input type="number" id="edit-height" class="form-input" placeholder="Рост, см" min="100" max="250" required>
+                </div>
+                
+                <select id="edit-goal" class="form-select" required>
+                    <option value="">Цель тренировок</option>
+                    <option value="weight_loss">Похудение</option>
+                    <option value="muscle_gain">Набор мышечной массы</option>
+                    <option value="maintenance">Поддержание формы</option>
+                    <option value="endurance">Развитие выносливости</option>
+                    <option value="strength">Развитие силы</option>
+                </select>
+                
+                <button class="btn-primary" onclick="saveProfileChanges()" style="width: 100%; margin-top: 20px;">
+                    <i class="fas fa-save"></i> Сохранить изменения
+                </button>
+                
+                <button class="btn-secondary" onclick="showScreen('profile')" style="width: 100%; margin-top: 15px;">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления тренировки -->
+    <div id="add-workout-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Добавить тренировку</h2>
+                <button class="modal-close" onclick="closeAddWorkoutModal()">×</button>
+            </div>
+            
+            <input type="text" id="workout-name" class="form-input" placeholder="Название тренировки">
+            
+            <div class="form-row">
+                <input type="number" id="workout-duration" class="form-input" placeholder="Длительность (мин)">
+                <input type="number" id="workout-calories" class="form-input" placeholder="Ккал">
+            </div>
+            
+            <select id="workout-type" class="form-select">
+                <option value="">Тип тренировки</option>
+                <option value="home">Домашняя</option>
+                <option value="gym">Зал</option>
+                <option value="cardio">Кардио</option>
+                <option value="rest">Отдых</option>
+            </select>
+            
+            <textarea id="workout-notes" class="form-input" placeholder="Заметки о тренировке" style="height: 100px;"></textarea>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 10px;">Упражнения:</h4>
+                <div id="exercise-list" style="margin-bottom: 15px;"></div>
+                <button type="button" class="exercise-add" onclick="addExerciseField()">
+                    <i class="fas fa-plus"></i> Добавить упражнение
+                </button>
+            </div>
+            
+            <button class="btn-primary" onclick="saveWorkoutToDiary()" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-save"></i> Сохранить тренировку
+            </button>
+        </div>
+    </div>
+
+    <!-- Детали тренировки из дневника -->
+    <div id="diary-detail-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div>
+                        <h1><i class="fas fa-book"></i> Детали тренировки</h1>
+                        <p id="diary-detail-date"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="diary-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
