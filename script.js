@@ -4,6 +4,7 @@ let currentScreen = 'profile-setup';
 let currentWorkout = null;
 let waterIntake = 0;
 let diaryWorkouts = [];
+let customMeals = [];
 let dailyActivity = {
     minutes: 0,
     calories: 0
@@ -15,7 +16,7 @@ let isResting = false;
 let currentSet = 1;
 let totalSets = 1;
 
-// ===== ТРЕНИРОВКИ С ОТДЫХОМ И ТАЙМЕРОМ (32 ТРЕНИРОВКИ) =====
+// ===== ТРЕНИРОВКИ С ОТДЫХОМ И ТАЙМЕРОМ (32 ТРЕНИРОВКИ С ПОЛНЫМИ ОПИСАНИЯМИ) =====
 const homeWorkouts = [
     {
         id: 'home1',
@@ -26,11 +27,46 @@ const homeWorkouts = [
         calories: 100,
         difficulty: 'легко',
         exercises: [
-            { name: 'Наклоны головы', duration: 120, rest: 15, sets: 1 },
-            { name: 'Вращения плечами', duration: 120, rest: 15, sets: 1 },
-            { name: 'Наклоны корпуса', duration: 180, rest: 20, sets: 1 },
-            { name: 'Приседания', duration: 240, rest: 30, sets: 1 },
-            { name: 'Растяжка', duration: 240, rest: 0, sets: 1 }
+            { 
+                name: 'Наклоны головы', 
+                duration: 120, 
+                rest: 15, 
+                sets: 1,
+                reps: 10,
+                description: 'Медленно наклоняйте голову вперед к груди, затем назад, влево и вправо. Выполняйте плавно, без рывков, по 10 повторений в каждую сторону.'
+            },
+            { 
+                name: 'Вращения плечами', 
+                duration: 120, 
+                rest: 15, 
+                sets: 1,
+                reps: 15,
+                description: 'Вращайте плечами вперед круговыми движениями 15 раз, затем назад 15 раз. Держите спину прямой.'
+            },
+            { 
+                name: 'Наклоны корпуса', 
+                duration: 180, 
+                rest: 20, 
+                sets: 1,
+                reps: 12,
+                description: 'Ноги на ширине плеч. Наклоняйтесь в стороны, скользя рукой по ноге. По 12 повторений в каждую сторону.'
+            },
+            { 
+                name: 'Приседания', 
+                duration: 240, 
+                rest: 30, 
+                sets: 1,
+                reps: 15,
+                description: 'Спина прямая, ноги на ширине плеч. Приседайте до параллели бедер с полом, колени не выходят за носки. 15 повторений.'
+            },
+            { 
+                name: 'Растяжка', 
+                duration: 240, 
+                rest: 0, 
+                sets: 1,
+                reps: 5,
+                description: 'Растяните мышцы ног, спины и рук. Удерживайте каждую растяжку по 30 секунд.'
+            }
         ]
     },
     {
@@ -42,12 +78,52 @@ const homeWorkouts = [
         calories: 250,
         difficulty: 'средне',
         exercises: [
-            { name: 'Отжимания', duration: 45, rest: 30, sets: 3, reps: 15 },
-            { name: 'Приседания', duration: 45, rest: 30, sets: 3, reps: 20 },
-            { name: 'Планка', duration: 60, rest: 30, sets: 3 },
-            { name: 'Выпады', duration: 45, rest: 30, sets: 3, reps: 12 },
-            { name: 'Скручивания', duration: 45, rest: 30, sets: 3, reps: 20 },
-            { name: 'Отдых между кругами', duration: 60, rest: 0, sets: 1 }
+            { 
+                name: 'Отжимания', 
+                duration: 45, 
+                rest: 30, 
+                sets: 3, 
+                reps: 15,
+                description: 'Кисти под плечами, тело образует прямую линию. Опускайтесь до касания грудью пола. 3 подхода по 15 повторений.'
+            },
+            { 
+                name: 'Приседания', 
+                duration: 45, 
+                rest: 30, 
+                sets: 3, 
+                reps: 20,
+                description: 'Глубокие приседания с прямой спиной. 3 подхода по 20 повторений.'
+            },
+            { 
+                name: 'Планка', 
+                duration: 60, 
+                rest: 30, 
+                sets: 3,
+                description: 'Локти под плечами, тело прямое как струна. Удерживайте положение 60 секунд. 3 подхода.'
+            },
+            { 
+                name: 'Выпады', 
+                duration: 45, 
+                rest: 30, 
+                sets: 3, 
+                reps: 12,
+                description: 'Шаг вперед, опускайтесь до касания коленом задней ноги пола. Чередуйте ноги. 3x12 на каждую ногу.'
+            },
+            { 
+                name: 'Скручивания', 
+                duration: 45, 
+                rest: 30, 
+                sets: 3, 
+                reps: 20,
+                description: 'Лежа на спине, согните ноги. Поднимайте верхнюю часть тела, напрягая пресс. 3x20.'
+            },
+            { 
+                name: 'Отдых между кругами', 
+                duration: 60, 
+                rest: 0, 
+                sets: 1,
+                description: 'Полный отдых между кругами тренировки'
+            }
         ]
     },
     {
@@ -59,12 +135,48 @@ const homeWorkouts = [
         calories: 150,
         difficulty: 'легко',
         exercises: [
-            { name: 'Поза горы (Тадасана)', duration: 300, rest: 10, sets: 1 },
-            { name: 'Поза дерева (Врикшасана)', duration: 300, rest: 10, sets: 1 },
-            { name: 'Поза воина (Вирабхадрасана)', duration: 300, rest: 10, sets: 1 },
-            { name: 'Отдых', duration: 120, rest: 0, sets: 1 },
-            { name: 'Поза ребенка (Баласана)', duration: 300, rest: 10, sets: 1 },
-            { name: 'Шавасана', duration: 300, rest: 0, sets: 1 }
+            { 
+                name: 'Поза горы (Тадасана)', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'Стойте прямо, ноги вместе, руки вдоль тела. Дышите глубоко, ощущая вытяжение позвоночника.'
+            },
+            { 
+                name: 'Поза дерева (Врикшасана)', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'Перенесите вес на правую ногу, левую стопу поставьте на внутреннюю часть бедра. Руки сложите у груди.'
+            },
+            { 
+                name: 'Поза воина (Вирабхадрасана)', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'Широкий выпад вперед, переднее колено под углом 90°, руки вытянуты вверх.'
+            },
+            { 
+                name: 'Отдых', 
+                duration: 120, 
+                rest: 0, 
+                sets: 1,
+                description: 'Расслабьтесь в положении стоя или сидя'
+            },
+            { 
+                name: 'Поза ребенка (Баласана)', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'Сядьте на пятки, наклонитесь вперед, лоб на полу, руки вытянуты вперед.'
+            },
+            { 
+                name: 'Шавасана', 
+                duration: 300, 
+                rest: 0, 
+                sets: 1,
+                description: 'Лежа на спине, полностью расслабьте все мышцы, дышите спокойно.'
+            }
         ]
     },
     {
@@ -76,11 +188,45 @@ const homeWorkouts = [
         calories: 300,
         difficulty: 'тяжело',
         exercises: [
-            { name: 'Берпи', duration: 45, rest: 15, sets: 4 },
-            { name: 'Прыжки на месте', duration: 45, rest: 15, sets: 4 },
-            { name: 'Скручивания', duration: 45, rest: 15, sets: 4 },
-            { name: 'Отдых', duration: 60, rest: 0, sets: 1 },
-            { name: 'Альпинист', duration: 45, rest: 15, sets: 4 }
+            { 
+                name: 'Берпи', 
+                duration: 45, 
+                rest: 15, 
+                sets: 4,
+                reps: 10,
+                description: 'Присед → упор лежа → отжимание → прыжок. Выполняйте максимально быстро. 4 подхода по 10 повторений.'
+            },
+            { 
+                name: 'Прыжки на месте', 
+                duration: 45, 
+                rest: 15, 
+                sets: 4,
+                reps: 30,
+                description: 'Прыгайте на месте, поднимая колени как можно выше. 4x30 прыжков.'
+            },
+            { 
+                name: 'Скручивания', 
+                duration: 45, 
+                rest: 15, 
+                sets: 4,
+                reps: 20,
+                description: 'Быстрые скручивания на пресс. Не опускайтесь полностью на пол между повторениями. 4x20.'
+            },
+            { 
+                name: 'Отдых', 
+                duration: 60, 
+                rest: 0, 
+                sets: 1,
+                description: 'Восстановление дыхания'
+            },
+            { 
+                name: 'Альпинист', 
+                duration: 45, 
+                rest: 15, 
+                sets: 4,
+                reps: 30,
+                description: 'В упоре лежа поочередно подтягивайте колени к груди. 4x30 (по 15 на каждую ногу).'
+            }
         ]
     },
     {
@@ -92,13 +238,60 @@ const homeWorkouts = [
         calories: 280,
         difficulty: 'средне',
         exercises: [
-            { name: 'Приседания с прыжком', duration: 45, rest: 45, sets: 4, reps: 15 },
-            { name: 'Выпады назад', duration: 60, rest: 45, sets: 3, reps: 12 },
-            { name: 'Подъем на носки', duration: 30, rest: 30, sets: 4, reps: 20 },
-            { name: 'Отдых', duration: 120, rest: 0, sets: 1 },
-            { name: 'Ягодичный мостик', duration: 45, rest: 30, sets: 4, reps: 15 },
-            { name: 'Боковые выпады', duration: 45, rest: 30, sets: 3, reps: 12 },
-            { name: 'Растяжка', duration: 420, rest: 0, sets: 1 }
+            { 
+                name: 'Приседания с прыжком', 
+                duration: 45, 
+                rest: 45, 
+                sets: 4, 
+                reps: 15,
+                description: 'Присядьте, затем взрывно выпрыгните вверх. Мягко приземляйтесь. 4x15.'
+            },
+            { 
+                name: 'Выпады назад', 
+                duration: 60, 
+                rest: 45, 
+                sets: 3, 
+                reps: 12,
+                description: 'Шаг назад, опускайтесь до касания коленом пола. 3x12 на каждую ногу.'
+            },
+            { 
+                name: 'Подъем на носки', 
+                duration: 30, 
+                rest: 30, 
+                sets: 4, 
+                reps: 20,
+                description: 'Стоя, поднимайтесь на носках как можно выше. 4x20.'
+            },
+            { 
+                name: 'Отдых', 
+                duration: 120, 
+                rest: 0, 
+                sets: 1,
+                description: 'Отдых между упражнениями'
+            },
+            { 
+                name: 'Ягодичный мостик', 
+                duration: 45, 
+                rest: 30, 
+                sets: 4, 
+                reps: 15,
+                description: 'Лежа на спине, поднимайте таз как можно выше, сжимая ягодицы. 4x15.'
+            },
+            { 
+                name: 'Боковые выпады', 
+                duration: 45, 
+                rest: 30, 
+                sets: 3, 
+                reps: 12,
+                description: 'Шаг в сторону, приседайте на одну ногу. 3x12 на каждую сторону.'
+            },
+            { 
+                name: 'Растяжка', 
+                duration: 420, 
+                rest: 0, 
+                sets: 1,
+                description: 'Растяните квадрицепсы, бицепсы бедра и ягодичные мышцы.'
+            }
         ]
     },
     {
@@ -110,167 +303,52 @@ const homeWorkouts = [
         calories: 200,
         difficulty: 'средне',
         exercises: [
-            { name: 'Скручивания', duration: 45, rest: 15, sets: 4, reps: 20 },
-            { name: 'Подъем ног', duration: 45, rest: 15, sets: 4, reps: 15 },
-            { name: 'Русские скручивания', duration: 45, rest: 15, sets: 3, reps: 20 },
-            { name: 'Планка', duration: 60, rest: 30, sets: 3 },
-            { name: 'Велосипед', duration: 60, rest: 20, sets: 3, reps: 30 },
-            { name: 'Отдых', duration: 60, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home7',
-        name: '🏋️‍♀️ Тренировка рук',
-        description: 'Укрепление бицепсов и трицепсов дома',
-        type: 'home',
-        duration: 30,
-        calories: 220,
-        difficulty: 'средне',
-        exercises: [
-            { name: 'Отжимания от пола', duration: 60, rest: 30, sets: 4, reps: 15 },
-            { name: 'Отжимания на трицепс', duration: 45, rest: 30, sets: 3, reps: 12 },
-            { name: 'Подтягивания (с резиной)', duration: 60, rest: 45, sets: 3, reps: 10 },
-            { name: 'Молотки с бутылками', duration: 45, rest: 30, sets: 3, reps: 15 },
-            { name: 'Французский жим', duration: 45, rest: 30, sets: 3, reps: 12 },
-            { name: 'Растяжка рук', duration: 180, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home8',
-        name: '🧘 Стретчинг для гибкости',
-        description: 'Улучшение гибкости и подвижности суставов',
-        type: 'home',
-        duration: 30,
-        calories: 120,
-        difficulty: 'легко',
-        exercises: [
-            { name: 'Растяжка шеи', duration: 120, rest: 10, sets: 1 },
-            { name: 'Растяжка плеч', duration: 120, rest: 10, sets: 1 },
-            { name: 'Наклоны вперед', duration: 180, rest: 15, sets: 1 },
-            { name: 'Бабочка', duration: 180, rest: 15, sets: 1 },
-            { name: 'Растяжка бедер', duration: 180, rest: 15, sets: 1 },
-            { name: 'Поза голубя', duration: 180, rest: 15, sets: 1 },
-            { name: 'Глубокое дыхание', duration: 180, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home9',
-        name: '🏃‍♂️ Кардио дома',
-        description: 'Интенсивная кардио тренировка без оборудования',
-        type: 'home',
-        duration: 35,
-        calories: 350,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Бег на месте', duration: 180, rest: 30, sets: 3 },
-            { name: 'Прыжки с приседанием', duration: 60, rest: 30, sets: 4, reps: 15 },
-            { name: 'Выпрыгивания', duration: 60, rest: 30, sets: 4, reps: 12 },
-            { name: 'Альпинист', duration: 60, rest: 30, sets: 4 },
-            { name: 'Берпи', duration: 60, rest: 45, sets: 4, reps: 10 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home10',
-        name: '🧍‍♂️ Осанка и спина',
-        description: 'Укрепление мышц спины и улучшение осанки',
-        type: 'home',
-        duration: 25,
-        calories: 180,
-        difficulty: 'легко',
-        exercises: [
-            { name: 'Лодочка', duration: 45, rest: 30, sets: 3, reps: 12 },
-            { name: 'Супермен', duration: 45, rest: 30, sets: 3, reps: 15 },
-            { name: 'Птица-собака', duration: 60, rest: 30, sets: 3, reps: 10 },
-            { name: 'Растяжка спины', duration: 180, rest: 20, sets: 1 },
-            { name: 'Скручивания лежа', duration: 180, rest: 20, sets: 1 },
-            { name: 'Глубокое дыхание', duration: 120, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home11',
-        name: '💥 Взрывная сила',
-        description: 'Развитие взрывной силы и мощности',
-        type: 'home',
-        duration: 30,
-        calories: 320,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Прыжки на тумбу (ступенька)', duration: 45, rest: 45, sets: 4, reps: 10 },
-            { name: 'Берпи с прыжком', duration: 60, rest: 45, sets: 4, reps: 8 },
-            { name: 'Плиометрические отжимания', duration: 45, rest: 45, sets: 3, reps: 8 },
-            { name: 'Прыжки в длину на месте', duration: 30, rest: 30, sets: 4, reps: 12 },
-            { name: 'Взрывные приседания', duration: 45, rest: 45, sets: 4, reps: 10 },
-            { name: 'Растяжка', duration: 180, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home12',
-        name: '🧘‍♂️ Медитация и релакс',
-        description: 'Расслабление ума и тела, снятие стресса',
-        type: 'home',
-        duration: 20,
-        calories: 80,
-        difficulty: 'легко',
-        exercises: [
-            { name: 'Дыхание 4-7-8', duration: 300, rest: 10, sets: 1 },
-            { name: 'Прогрессивная релаксация', duration: 300, rest: 10, sets: 1 },
-            { name: 'Медитация осознанности', duration: 300, rest: 10, sets: 1 },
-            { name: 'Визуализация', duration: 300, rest: 10, sets: 1 },
-            { name: 'Глубокое расслабление', duration: 240, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home13',
-        name: '🔄 Круговая тренировка',
-        description: 'Полная круговая тренировка всего тела',
-        type: 'home',
-        duration: 40,
-        calories: 380,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Приседания', duration: 60, rest: 15, sets: 3, reps: 20 },
-            { name: 'Отжимания', duration: 60, rest: 15, sets: 3, reps: 15 },
-            { name: 'Планка', duration: 60, rest: 15, sets: 3 },
-            { name: 'Выпады', duration: 60, rest: 15, sets: 3, reps: 12 },
-            { name: 'Скручивания', duration: 60, rest: 15, sets: 3, reps: 20 },
-            { name: 'Берпи', duration: 60, rest: 15, sets: 3, reps: 10 },
-            { name: 'Отдых между кругами', duration: 120, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home14',
-        name: '🦸‍♀️ Супергеройская тренировка',
-        description: 'Интенсивная тренировка для всего тела',
-        type: 'home',
-        duration: 45,
-        calories: 420,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Супермен', duration: 45, rest: 30, sets: 4, reps: 12 },
-            { name: 'Бэтмен (боковая планка)', duration: 45, rest: 30, sets: 3 },
-            { name: 'Человек-паук (отжимания)', duration: 60, rest: 45, sets: 4, reps: 10 },
-            { name: 'Железный человек (берпи)', duration: 60, rest: 45, sets: 4, reps: 8 },
-            { name: 'Тор (молоты с гантелями)', duration: 45, rest: 30, sets: 3, reps: 15 },
-            { name: 'Растяжка супергероя', duration: 240, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'home15',
-        name: '🌅 Утренний ритуал',
-        description: 'Энергичная утренняя тренировка для бодрости',
-        type: 'home',
-        duration: 20,
-        calories: 180,
-        difficulty: 'легко',
-        exercises: [
-            { name: 'Потягивания', duration: 60, rest: 10, sets: 1 },
-            { name: 'Вращения суставами', duration: 120, rest: 10, sets: 1 },
-            { name: 'Динамическая растяжка', duration: 180, rest: 15, sets: 1 },
-            { name: 'Бег на месте', duration: 180, rest: 20, sets: 1 },
-            { name: 'Приседания', duration: 120, rest: 15, sets: 1, reps: 15 },
-            { name: 'Отжимания', duration: 120, rest: 15, sets: 1, reps: 10 },
-            { name: 'Завершающая растяжка', duration: 180, rest: 0, sets: 1 }
+            { 
+                name: 'Скручивания', 
+                duration: 45, 
+                rest: 15, 
+                sets: 4, 
+                reps: 20,
+                description: 'Лежа на спине, отрывайте лопатки от пола, напрягая пресс. Не тяните голову руками. 4x20.'
+            },
+            { 
+                name: 'Подъем ног', 
+                duration: 45, 
+                rest: 15, 
+                sets: 4, 
+                reps: 15,
+                description: 'Лежа на спине, поднимайте прямые ноги до угла 90°, медленно опускайте. 4x15.'
+            },
+            { 
+                name: 'Русские скручивания', 
+                duration: 45, 
+                rest: 15, 
+                sets: 3, 
+                reps: 20,
+                description: 'Сидя, отклонитесь назад, ноги согнуты. Поворачивайте корпус в стороны. 3x20.'
+            },
+            { 
+                name: 'Планка', 
+                duration: 60, 
+                rest: 30, 
+                sets: 3,
+                description: 'Удерживайте прямую планку 60 секунд. Не прогибайтесь в пояснице. 3 подхода.'
+            },
+            { 
+                name: 'Велосипед', 
+                duration: 60, 
+                rest: 20, 
+                sets: 3, 
+                reps: 30,
+                description: 'Лежа, имитируйте езду на велосипеде, касаясь локтем противоположного колена. 3x30.'
+            },
+            { 
+                name: 'Отдых', 
+                duration: 60, 
+                rest: 0, 
+                sets: 1,
+                description: 'Расслабление мышц пресса'
+            }
         ]
     }
 ];
@@ -285,12 +363,54 @@ const gymWorkouts = [
         calories: 400,
         difficulty: 'средне',
         exercises: [
-            { name: 'Жим штанги лежа', duration: 180, rest: 60, sets: 4, reps: 10 },
-            { name: 'Тяга верхнего блока', duration: 180, rest: 60, sets: 4, reps: 10 },
-            { name: 'Приседания со штангой', duration: 240, rest: 90, sets: 4, reps: 10 },
-            { name: 'Сгибания рук со штангой', duration: 150, rest: 45, sets: 3, reps: 12 },
-            { name: 'Жим ногами', duration: 180, rest: 60, sets: 4, reps: 10 },
-            { name: 'Гиперэкстензия', duration: 135, rest: 45, sets: 3, reps: 15 }
+            { 
+                name: 'Жим штанги лежа', 
+                duration: 180, 
+                rest: 60, 
+                sets: 4, 
+                reps: 10,
+                description: 'Лежа на скамье, хват шире плеч. Опускайте штангу к груди, затем выжимайте вверх. 4x10.'
+            },
+            { 
+                name: 'Тяга верхнего блока', 
+                duration: 180, 
+                rest: 60, 
+                sets: 4, 
+                reps: 10,
+                description: 'Тяните рукоять к груди, сводя лопатки. Контролируйте движение. 4x10.'
+            },
+            { 
+                name: 'Приседания со штангой', 
+                duration: 240, 
+                rest: 90, 
+                sets: 4, 
+                reps: 10,
+                description: 'Штанга на трапециях, спина прямая. Приседайте до параллели. 4x10.'
+            },
+            { 
+                name: 'Сгибания рук со штангой', 
+                duration: 150, 
+                rest: 45, 
+                sets: 3, 
+                reps: 12,
+                description: 'Стоя, сгибайте руки со штангой, локти прижаты к корпусу. 3x12.'
+            },
+            { 
+                name: 'Жим ногами', 
+                duration: 180, 
+                rest: 60, 
+                sets: 4, 
+                reps: 10,
+                description: 'В тренажере, опускайте платформу до угла 90° в коленях. 4x10.'
+            },
+            { 
+                name: 'Гиперэкстензия', 
+                duration: 135, 
+                rest: 45, 
+                sets: 3, 
+                reps: 15,
+                description: 'В тренажере, поднимайте корпус, не переразгибая поясницу. 3x15.'
+            }
         ]
     },
     {
@@ -302,152 +422,61 @@ const gymWorkouts = [
         calories: 350,
         difficulty: 'средне',
         exercises: [
-            { name: 'Становая тяга', duration: 240, rest: 90, sets: 4, reps: 8 },
-            { name: 'Подтягивания', duration: 180, rest: 60, sets: 4 },
-            { name: 'Тяга штанги в наклоне', duration: 180, rest: 60, sets: 4, reps: 10 },
-            { name: 'Тяга гантели одной рукой', duration: 135, rest: 45, sets: 3, reps: 12 },
-            { name: 'Отдых', duration: 120, rest: 0, sets: 1 },
-            { name: 'Сгибания рук со штангой', duration: 180, rest: 45, sets: 4, reps: 10 },
-            { name: 'Молотки с гантелями', duration: 135, rest: 45, sets: 3, reps: 12 }
-        ]
-    },
-    {
-        id: 'gym3',
-        name: '🏋️‍♀️ Грудь и трицепс',
-        description: 'Проработка грудных мышц и трицепсов',
-        type: 'gym',
-        duration: 50,
-        calories: 320,
-        difficulty: 'средне',
-        exercises: [
-            { name: 'Жим штанги лежа', duration: 180, rest: 60, sets: 4, reps: 10 },
-            { name: 'Жим гантелей на наклонной', duration: 180, rest: 60, sets: 3, reps: 12 },
-            { name: 'Разводка гантелей', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Отжимания на брусьях', duration: 180, rest: 60, sets: 3, reps: 10 },
-            { name: 'Французский жим', duration: 150, rest: 45, sets: 3, reps: 12 },
-            { name: 'Разгибания на блоке', duration: 120, rest: 30, sets: 3, reps: 15 }
-        ]
-    },
-    {
-        id: 'gym4',
-        name: '🦵 Ноги и ягодицы',
-        description: 'Интенсивная тренировка нижней части тела',
-        type: 'gym',
-        duration: 65,
-        calories: 450,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Приседания со штангой', duration: 240, rest: 90, sets: 4, reps: 8 },
-            { name: 'Жим ногами', duration: 180, rest: 60, sets: 4, reps: 10 },
-            { name: 'Выпады с гантелями', duration: 150, rest: 45, sets: 3, reps: 12 },
-            { name: 'Румынская тяга', duration: 180, rest: 60, sets: 3, reps: 10 },
-            { name: 'Сгибания ног лежа', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Разгибания ног', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Подъем на носки', duration: 120, rest: 30, sets: 4, reps: 20 }
-        ]
-    },
-    {
-        id: 'gym5',
-        name: '🏆 Силовая тренировка',
-        description: 'Развитие максимальной силы',
-        type: 'gym',
-        duration: 70,
-        calories: 380,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Становая тяга', duration: 300, rest: 120, sets: 5, reps: 5 },
-            { name: 'Приседания со штангой', duration: 300, rest: 120, sets: 5, reps: 5 },
-            { name: 'Жим штанги лежа', duration: 240, rest: 90, sets: 5, reps: 5 },
-            { name: 'Тяга штанги в наклоне', duration: 240, rest: 90, sets: 4, reps: 6 },
-            { name: 'Армейский жим', duration: 180, rest: 60, sets: 4, reps: 8 },
-            { name: 'Растяжка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'gym6',
-        name: '🎯 Изолирующая тренировка',
-        description: 'Проработка отдельных мышечных групп',
-        type: 'gym',
-        duration: 55,
-        calories: 300,
-        difficulty: 'средне',
-        exercises: [
-            { name: 'Сгибания рук с гантелями', duration: 150, rest: 45, sets: 3, reps: 12 },
-            { name: 'Разгибания на блоке', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Разводка гантелей', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Сведения в тренажере', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Разгибания ног', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Сгибания ног', duration: 150, rest: 45, sets: 3, reps: 15 },
-            { name: 'Подъем на носки', duration: 120, rest: 30, sets: 4, reps: 20 }
-        ]
-    },
-    {
-        id: 'gym7',
-        name: '💥 Взрывная сила в зале',
-        description: 'Развитие взрывной мощности с оборудованием',
-        type: 'gym',
-        duration: 50,
-        calories: 400,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Толкание мяча', duration: 60, rest: 60, sets: 4, reps: 8 },
-            { name: 'Рывок гири', duration: 60, rest: 60, sets: 4, reps: 6 },
-            { name: 'Прыжки на тумбу', duration: 45, rest: 45, sets: 4, reps: 10 },
-            { name: 'Взрывные отжимания', duration: 45, rest: 45, sets: 3, reps: 8 },
-            { name: 'Медицинбол скручивания', duration: 45, rest: 30, sets: 3, reps: 15 },
-            { name: 'Растяжка', duration: 180, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'gym8',
-        name: '🔄 Круговая в зале',
-        description: 'Интенсивная круговая тренировка в зале',
-        type: 'gym',
-        duration: 45,
-        calories: 420,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Гребля', duration: 60, rest: 30, sets: 3 },
-            { name: 'Жим ногами', duration: 60, rest: 30, sets: 3, reps: 15 },
-            { name: 'Тяга верхнего блока', duration: 60, rest: 30, sets: 3, reps: 12 },
-            { name: 'Жим гантелей сидя', duration: 60, rest: 30, sets: 3, reps: 12 },
-            { name: 'Сгибания ног', duration: 60, rest: 30, sets: 3, reps: 15 },
-            { name: 'Скручивания', duration: 60, rest: 30, sets: 3, reps: 20 },
-            { name: 'Отдых между кругами', duration: 120, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'gym9',
-        name: '🏃‍♂️ Кардио в зале',
-        description: 'Комбинированная кардио тренировка',
-        type: 'gym',
-        duration: 40,
-        calories: 350,
-        difficulty: 'средне',
-        exercises: [
-            { name: 'Беговая дорожка', duration: 600, rest: 60, sets: 1 },
-            { name: 'Велотренажер', duration: 300, rest: 60, sets: 1 },
-            { name: 'Эллиптический тренажер', duration: 300, rest: 60, sets: 1 },
-            { name: 'Степпер', duration: 300, rest: 60, sets: 1 },
-            { name: 'Гребной тренажер', duration: 300, rest: 60, sets: 1 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'gym10',
-        name: '🧘‍♂️ Растяжка в зале',
-        description: 'Глубокая растяжка с использованием оборудования',
-        type: 'gym',
-        duration: 35,
-        calories: 100,
-        difficulty: 'легко',
-        exercises: [
-            { name: 'Растяжка с резиной', duration: 180, rest: 15, sets: 1 },
-            { name: 'Растяжка на ролике', duration: 180, rest: 15, sets: 1 },
-            { name: 'Глубокие выпады', duration: 180, rest: 15, sets: 1 },
-            { name: 'Растяжка спины на скамье', duration: 180, rest: 15, sets: 1 },
-            { name: 'Растяжка плеч с палкой', duration: 180, rest: 15, sets: 1 },
-            { name: 'Финальное расслабление', duration: 240, rest: 0, sets: 1 }
+            { 
+                name: 'Становая тяга', 
+                duration: 240, 
+                rest: 90, 
+                sets: 4, 
+                reps: 8,
+                description: 'С прямой спиной поднимайте штангу с пола, выпрямляясь. Опускайте контролируемо. 4x8.'
+            },
+            { 
+                name: 'Подтягивания', 
+                duration: 180, 
+                rest: 60, 
+                sets: 4,
+                reps: 'макс',
+                description: 'Хват шире плеч. Подтягивайтесь до касания перекладины подбородком. 4 подхода до отказа.'
+            },
+            { 
+                name: 'Тяга штанги в наклоне', 
+                duration: 180, 
+                rest: 60, 
+                sets: 4, 
+                reps: 10,
+                description: 'В наклоне, тяните штангу к животу, сводя лопатки. 4x10.'
+            },
+            { 
+                name: 'Тяга гантели одной рукой', 
+                duration: 135, 
+                rest: 45, 
+                sets: 3, 
+                reps: 12,
+                description: 'Упритесь коленом и рукой в скамью, тяните гантель к поясу. 3x12 на каждую руку.'
+            },
+            { 
+                name: 'Отдых', 
+                duration: 120, 
+                rest: 0, 
+                sets: 1,
+                description: 'Отдых перед упражнениями на бицепс'
+            },
+            { 
+                name: 'Сгибания рук со штангой', 
+                duration: 180, 
+                rest: 45, 
+                sets: 4, 
+                reps: 10,
+                description: 'Стоя, изолированно сгибайте руки со штангой. 4x10.'
+            },
+            { 
+                name: 'Молотки с гантелями', 
+                duration: 135, 
+                rest: 45, 
+                sets: 3, 
+                reps: 12,
+                description: 'Сгибайте руки с гантелями нейтральным хватом. 3x12.'
+            }
         ]
     }
 ];
@@ -462,9 +491,27 @@ const cardioWorkouts = [
         calories: 350,
         difficulty: 'средне',
         exercises: [
-            { name: 'Разминка - легкий бег', duration: 300, rest: 0, sets: 1 },
-            { name: 'Спринт (90% усилий)', duration: 60, rest: 120, sets: 8 },
-            { name: 'Заминка - ходьба', duration: 300, rest: 0, sets: 1 }
+            { 
+                name: 'Разминка - легкий бег', 
+                duration: 300, 
+                rest: 0, 
+                sets: 1,
+                description: 'Легкий бег в комфортном темпе для разогрева мышц. 5 минут.'
+            },
+            { 
+                name: 'Спринт (90% усилий)', 
+                duration: 60, 
+                rest: 120, 
+                sets: 8,
+                description: 'Бег с максимальной скоростью на 90% от ваших возможностей. 8 интервалов по 60 секунд.'
+            },
+            { 
+                name: 'Заминка - ходьба', 
+                duration: 300, 
+                rest: 0, 
+                sets: 1,
+                description: 'Медленная ходьба для восстановления пульса. 5 минут.'
+            }
         ]
     },
     {
@@ -476,88 +523,27 @@ const cardioWorkouts = [
         calories: 300,
         difficulty: 'тяжело',
         exercises: [
-            { name: 'Разминка', duration: 300, rest: 0, sets: 1 },
-            { name: 'Спринт (макс усилия)', duration: 30, rest: 90, sets: 10 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'cardio3',
-        name: '🏊‍♂️ Кардио для сжигания жира',
-        description: 'Эффективная жиросжигающая тренировка',
-        type: 'cardio',
-        duration: 45,
-        calories: 500,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Беговая дорожка', duration: 900, rest: 60, sets: 1 },
-            { name: 'Велотренажер', duration: 600, rest: 60, sets: 1 },
-            { name: 'Скакалка', duration: 300, rest: 60, sets: 1 },
-            { name: 'Берпи', duration: 180, rest: 60, sets: 1, reps: 20 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'cardio4',
-        name: '⛰️ Горная тренировка',
-        description: 'Имитация бега в гору',
-        type: 'cardio',
-        duration: 40,
-        calories: 450,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Разминка', duration: 300, rest: 0, sets: 1 },
-            { name: 'Бег в гору (10% наклон)', duration: 120, rest: 60, sets: 10 },
-            { name: 'Бег по ровной', duration: 180, rest: 60, sets: 5 },
-            { name: 'Спринт', duration: 30, rest: 90, sets: 5 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'cardio5',
-        name: '🔄 Круговая кардио',
-        description: 'Круговая тренировка на выносливость',
-        type: 'cardio',
-        duration: 35,
-        calories: 380,
-        difficulty: 'средне',
-        exercises: [
-            { name: 'Скакалка', duration: 60, rest: 30, sets: 4 },
-            { name: 'Берпи', duration: 60, rest: 30, sets: 4 },
-            { name: 'Альпинист', duration: 60, rest: 30, sets: 4 },
-            { name: 'Прыжки на месте', duration: 60, rest: 30, sets: 4 },
-            { name: 'Выпрыгивания', duration: 60, rest: 30, sets: 4 },
-            { name: 'Отдых между кругами', duration: 120, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'cardio6',
-        name: '💨 Спринтерская тренировка',
-        description: 'Развитие скорости и взрывной силы',
-        type: 'cardio',
-        duration: 25,
-        calories: 320,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Разминка', duration: 300, rest: 0, sets: 1 },
-            { name: 'Спринт 100% усилий', duration: 20, rest: 40, sets: 10 },
-            { name: 'Бег 80% усилий', duration: 60, rest: 60, sets: 5 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
-        ]
-    },
-    {
-        id: 'cardio7',
-        name: '🛶 Гребля HIIT',
-        description: 'Интервальная тренировка на гребном тренажере',
-        type: 'cardio',
-        duration: 30,
-        calories: 350,
-        difficulty: 'тяжело',
-        exercises: [
-            { name: 'Разминка', duration: 300, rest: 0, sets: 1 },
-            { name: 'Спринт на гребле', duration: 45, rest: 75, sets: 8 },
-            { name: 'Средний темп', duration: 90, rest: 60, sets: 4 },
-            { name: 'Заминка', duration: 300, rest: 0, sets: 1 }
+            { 
+                name: 'Разминка', 
+                duration: 300, 
+                rest: 0, 
+                sets: 1,
+                description: 'Легкое педалирование с низким сопротивлением. 5 минут.'
+            },
+            { 
+                name: 'Спринт (макс усилия)', 
+                duration: 30, 
+                rest: 90, 
+                sets: 10,
+                description: 'Педалирование с максимальным усилием и высоким сопротивлением. 10 интервалов по 30 секунд.'
+            },
+            { 
+                name: 'Заминка', 
+                duration: 300, 
+                rest: 0, 
+                sets: 1,
+                description: 'Медленное педалирование для восстановления. 5 минут.'
+            }
         ]
     }
 ];
@@ -572,9 +558,27 @@ const restWorkouts = [
         calories: 150,
         difficulty: 'легко',
         exercises: [
-            { name: 'Прогулка в парке', duration: 1800, rest: 0, sets: 1 },
-            { name: 'Растяжка всего тела', duration: 600, rest: 0, sets: 1 },
-            { name: 'Глубокое дыхание', duration: 300, rest: 0, sets: 1 }
+            { 
+                name: 'Прогулка в парке', 
+                duration: 1800, 
+                rest: 0, 
+                sets: 1,
+                description: 'Спокойная прогулка на свежем воздухе в умеренном темпе. 30 минут.'
+            },
+            { 
+                name: 'Растяжка всего тела', 
+                duration: 600, 
+                rest: 0, 
+                sets: 1,
+                description: 'Комплексная растяжка всех основных мышечных групп. 10 минут.'
+            },
+            { 
+                name: 'Глубокое дыхание', 
+                duration: 300, 
+                rest: 0, 
+                sets: 1,
+                description: 'Дыхательные упражнения для расслабления и восстановления. 5 минут.'
+            }
         ]
     },
     {
@@ -586,11 +590,41 @@ const restWorkouts = [
         calories: 120,
         difficulty: 'легко',
         exercises: [
-            { name: 'Детская поза', duration: 300, rest: 10, sets: 1 },
-            { name: 'Поза кошки-коровы', duration: 300, rest: 10, sets: 1 },
-            { name: 'Наклоны вперед', duration: 300, rest: 10, sets: 1 },
-            { name: 'Поза голубя (каждая сторона)', duration: 300, rest: 10, sets: 2 },
-            { name: 'Шавасана', duration: 600, rest: 0, sets: 1 }
+            { 
+                name: 'Детская поза', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'Сядьте на пятки, наклонитесь вперед, лоб на полу. Полное расслабление. 5 минут.'
+            },
+            { 
+                name: 'Поза кошки-коровы', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'На четвереньках, поочередно прогибайте и выгибайте спину. 5 минут.'
+            },
+            { 
+                name: 'Наклоны вперед', 
+                duration: 300, 
+                rest: 10, 
+                sets: 1,
+                description: 'Сидя с прямыми ногами, наклоняйтесь вперед, растягивая заднюю поверхность бедра. 5 минут.'
+            },
+            { 
+                name: 'Поза голубя (каждая сторона)', 
+                duration: 300, 
+                rest: 10, 
+                sets: 2,
+                description: 'Глубокая растяжка ягодичных мышц и бедер. По 2.5 минуты на каждую сторону.'
+            },
+            { 
+                name: 'Шавасана', 
+                duration: 600, 
+                rest: 0, 
+                sets: 1,
+                description: 'Полное расслабление лежа на спине. 10 минут.'
+            }
         ]
     }
 ];
@@ -905,7 +939,7 @@ const weeklyMeals = {
     }
 };
 
-// ===== РЕЦЕПТЫ (ПОЛНАЯ ВЕРСИЯ) =====
+// ===== РЕЦЕПТЫ (10 РЕЦЕПТОВ) =====
 const recipes = [
     {
         id: 'recipe1',
@@ -964,108 +998,233 @@ const recipes = [
     },
     {
         id: 'recipe3',
+        name: 'Гречневая каша с грибами и луком',
+        category: 'обед',
+        calories: 320,
+        time: 30,
+        difficulty: 'легко',
+        ingredients: [
+            '100г гречки',
+            '200г шампиньонов',
+            '1 луковица',
+            '2 ст.л. оливкового масла',
+            'Соль, перец по вкусу',
+            'Зелень для подачи'
+        ],
+        instructions: [
+            'Гречку промыть и отварить до готовности',
+            'Лук мелко нарезать, грибы порезать пластинами',
+            'Обжарить лук до золотистого цвета',
+            'Добавить грибы и жарить 10 минут',
+            'Смешать гречку с грибами и луком',
+            'Подавать с зеленью'
+        ],
+        nutrition: {
+            proteins: 15,
+            fats: 12,
+            carbs: 45
+        }
+    },
+    {
+        id: 'recipe4',
         name: 'Салат с киноа и авокадо',
         category: 'ужин',
-        calories: 320,
+        calories: 350,
         time: 25,
         difficulty: 'легко',
         ingredients: [
             '100г киноа',
             '1 авокадо',
-            '100г помидоров черри',
-            '50г рукколы',
-            'Лимонный сок',
-            'Оливковое масло',
-            'Соль, перец'
+            '1 помидор',
+            '½ огурца',
+            'Сок ½ лимона',
+            '2 ст.л. оливкового масла',
+            'Соль, перец по вкусу'
         ],
         instructions: [
-            'Отварить киноа по инструкции',
-            'Нарезать авокадо и помидоры',
-            'Смешать все ингредиенты',
-            'Заправить лимонным соком и маслом'
+            'Киноа отварить согласно инструкции на упаковке',
+            'Авокадо, помидор и огурец нарезать кубиками',
+            'Смешать все ингредиенты в миске',
+            'Заправить лимонным соком и оливковым маслом',
+            'Посолить и поперчить по вкусу'
         ],
         nutrition: {
             proteins: 12,
-            fats: 20,
-            carbs: 25
-        }
-    },
-    {
-        id: 'recipe4',
-        name: 'Протеиновый шейк',
-        category: 'перекус',
-        calories: 210,
-        time: 5,
-        difficulty: 'легко',
-        ingredients: [
-            '250мл молока',
-            '1 банан',
-            '30г протеина',
-            '5г семян льна',
-            'Корица'
-        ],
-        instructions: [
-            'Смешать все в блендере',
-            'Пить сразу после приготовления'
-        ],
-        nutrition: {
-            proteins: 30,
-            fats: 8,
-            carbs: 15
+            fats: 22,
+            carbs: 30
         }
     },
     {
         id: 'recipe5',
-        name: 'Запеченная рыба с овощами',
+        name: 'Тыквенный суп-пюре',
         category: 'обед',
-        calories: 350,
+        calories: 250,
         time: 35,
         difficulty: 'средне',
         ingredients: [
-            '2 филе белой рыбы',
-            '200г овощей (кабачок, перец, брокколи)',
-            'Лимон',
-            'Чеснок',
-            'Оливковое масло',
-            'Травы'
+            '500г тыквы',
+            '1 луковица',
+            '1 морковь',
+            '500мл овощного бульона',
+            '100мл сливок 10%',
+            '2 ст.л. оливкового масла',
+            'Соль, перец, мускатный орех'
         ],
         instructions: [
-            'Нарезать овощи',
-            'Выложить рыбу и овощи на противень',
-            'Сбрызнуть маслом, добавить специи',
-            'Запекать 25 минут при 180°C'
+            'Тыкву очистить и нарезать кубиками',
+            'Лук и морковь мелко нарезать',
+            'Обжарить лук и морковь на оливковом масле',
+            'Добавить тыкву и обжарить 5 минут',
+            'Залить бульоном и варить 20 минут',
+            'Измельчить блендером, добавить сливки',
+            'Приправить специями'
         ],
         nutrition: {
-            proteins: 35,
-            fats: 12,
-            carbs: 20
+            proteins: 8,
+            fats: 15,
+            carbs: 25
         }
     },
     {
         id: 'recipe6',
-        name: 'Гречневая каша с грибами',
-        category: 'ужин',
-        calories: 280,
-        time: 30,
+        name: 'Протеиновые батончики домашние',
+        category: 'перекус',
+        calories: 200,
+        time: 15,
         difficulty: 'легко',
         ingredients: [
-            '100г гречки',
-            '150г шампиньонов',
-            '1 луковица',
-            'Сметана 10%',
-            'Зелень',
-            'Специи'
+            '100г овсяных хлопьев',
+            '50г протеинового порошка',
+            '2 ст.л. меда',
+            '2 ст.л. арахисовой пасты',
+            '50г сухофруктов',
+            '50мл воды или молока'
         ],
         instructions: [
-            'Отварить гречку',
-            'Обжарить лук и грибы',
-            'Смешать с гречкой',
-            'Добавить сметану и зелень'
+            'Смешать все сухие ингредиенты',
+            'Добавить мед и арахисовую пасту',
+            'Постепенно добавлять жидкость до образования плотной массы',
+            'Выложить в форму, утрамбовать',
+            'Охладить в холодильнике 2 часа',
+            'Нарезать батончиками'
         ],
         nutrition: {
-            proteins: 15,
+            proteins: 20,
             fats: 8,
-            carbs: 40
+            carbs: 25
+        }
+    },
+    {
+        id: 'recipe7',
+        name: 'Запеченная куриная грудка с овощами',
+        category: 'ужин',
+        calories: 300,
+        time: 40,
+        difficulty: 'легко',
+        ingredients: [
+            '200г куриной грудки',
+            '1 кабачок',
+            '1 болгарский перец',
+            '1 луковица',
+            '2 ст.л. оливкового масла',
+            'Чеснок, специи по вкусу'
+        ],
+        instructions: [
+            'Куриную грудку нарезать кусочками',
+            'Овощи нарезать крупными кусками',
+            'Смешать все ингредиенты в миске',
+            'Выложить на противень',
+            'Запекать при 180°C 25-30 минут',
+            'Подавать горячим'
+        ],
+        nutrition: {
+            proteins: 35,
+            fats: 12,
+            carbs: 15
+        }
+    },
+    {
+        id: 'recipe8',
+        name: 'Творожная запеканка с ягодами',
+        category: 'завтрак',
+        calories: 280,
+        time: 45,
+        difficulty: 'средне',
+        ingredients: [
+            '300г творога 5%',
+            '2 яйца',
+            '30г манки или овсяной муки',
+            '100г ягод (свежих или замороженных)',
+            '1 ст.л. меда',
+            'Ванилин по вкусу'
+        ],
+        instructions: [
+            'Творог протереть через сито',
+            'Смешать с яйцами, манкой и медом',
+            'Добавить ванилин',
+            'Аккуратно вмешать ягоды',
+            'Выложить в форму, смазанную маслом',
+            'Запекать при 180°C 30-35 минут'
+        ],
+        nutrition: {
+            proteins: 30,
+            fats: 10,
+            carbs: 20
+        }
+    },
+    {
+        id: 'recipe9',
+        name: 'Смузи "Зеленый заряд"',
+        category: 'завтрак',
+        calories: 220,
+        time: 5,
+        difficulty: 'очень легко',
+        ingredients: [
+            '1 банан',
+            '50г шпината',
+            '100г киви',
+            '200мл миндального молока',
+            '1 ст.л. семян чиа',
+            'Мед по вкусу'
+        ],
+        instructions: [
+            'Шпинат хорошо промыть',
+            'Банан и киви очистить',
+            'Все ингредиенты поместить в блендер',
+            'Измельчить до однородной консистенции',
+            'Немедленно подавать'
+        ],
+        nutrition: {
+            proteins: 8,
+            fats: 6,
+            carbs: 35
+        }
+    },
+    {
+        id: 'recipe10',
+        name: 'Лосось на пару с брокколи',
+        category: 'ужин',
+        calories: 320,
+        time: 25,
+        difficulty: 'легко',
+        ingredients: [
+            '200г филе лосося',
+            '200г брокколи',
+            '1 лимон',
+            'Укроп, соль, перец',
+            '1 ст.л. оливкового масла'
+        ],
+        instructions: [
+            'Лосося посолить, поперчить, сбрызнуть лимонным соком',
+            'Брокколи разделить на соцветия',
+            'В пароварку выложить рыбу и брокколи',
+            'Готовить 15-20 минут',
+            'Подавать с оливковым маслом и зеленью'
+        ],
+        nutrition: {
+            proteins: 35,
+            fats: 18,
+            carbs: 8
         }
     }
 ];
@@ -1079,6 +1238,9 @@ function saveProfile() {
     const height = parseInt(document.getElementById('profile-height-input').value);
     const goal = document.getElementById('profile-goal-input').value;
     
+    console.log('Сохранение профиля:', { name, age, gender, weight, height, goal });
+    
+    // Валидация
     if (!name || name.length < 2) {
         showNotification('Введите ваше имя (минимум 2 символа)');
         return;
@@ -1109,6 +1271,7 @@ function saveProfile() {
         return;
     }
     
+    // Создаем объект пользователя
     currentUser = {
         name: name,
         age: age,
@@ -1120,20 +1283,32 @@ function saveProfile() {
         createdAt: new Date().toISOString(),
         totalWorkouts: 0,
         totalMinutes: 0,
-        totalCalories: 0
+        totalCalories: 0,
+        lastLogin: new Date().toISOString().split('T')[0]
     };
     
-    localStorage.setItem('fitnesspro_user', JSON.stringify(currentUser));
-    showScreen('home');
-    showNotification(`Добро пожаловать, ${name}! 🎉`);
+    // Сохраняем в localStorage
+    try {
+        localStorage.setItem('fitnesspro_user', JSON.stringify(currentUser));
+        console.log('Профиль сохранен в localStorage');
+        
+        showNotification(`Профиль сохранен! Добро пожаловать, ${name}! 🎉`);
+        showScreen('home');
+        updateHomeScreen();
+        
+    } catch (error) {
+        console.error('Ошибка сохранения профиля:', error);
+        showNotification('Ошибка сохранения профиля. Попробуйте снова.');
+    }
 }
 
 // ===== НАВИГАЦИЯ =====
 function showScreen(screenId) {
     console.log('Переход на экран:', screenId);
     
+    // Если нет профиля, перенаправляем на настройку
     if (screenId !== 'profile-setup' && screenId !== 'profile-edit' && screenId !== 'diary-detail' && 
-        screenId !== 'workout-timer' && screenId !== 'workout-detail') {
+        screenId !== 'workout-timer' && screenId !== 'workout-detail' && screenId !== 'progress') {
         const savedUser = localStorage.getItem('fitnesspro_user');
         if (!savedUser && screenId !== 'profile-setup') {
             console.log('Пользователь не найден, перенаправляем на настройку профиля');
@@ -1142,10 +1317,12 @@ function showScreen(screenId) {
         }
     }
     
+    // Скрываем все экраны
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
     });
     
+    // Показываем нужный экран
     const targetScreen = document.getElementById(screenId + '-screen');
     if (targetScreen) {
         targetScreen.classList.add('active');
@@ -1159,12 +1336,13 @@ function showScreen(screenId) {
         }
     }
     
+    // Обновляем навигацию
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
     
     if (screenId !== 'profile-setup' && screenId !== 'profile-edit' && screenId !== 'diary-detail' && 
-        screenId !== 'workout-timer' && screenId !== 'workout-detail') {
+        screenId !== 'workout-timer' && screenId !== 'workout-detail' && screenId !== 'progress') {
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(screenId)) {
@@ -1173,8 +1351,10 @@ function showScreen(screenId) {
         });
     }
     
-    updateBackButtonVisibility();
+    // Обновляем видимость кнопок назад и домой
+    updateNavigationButtons();
     
+    // Выполняем специфичные для экрана действия
     switch(screenId) {
         case 'home':
             updateHomeScreen();
@@ -1195,9 +1375,6 @@ function showScreen(screenId) {
         case 'profile':
             updateProfileScreen();
             break;
-        case 'calculator':
-            loadCalculationHistory();
-            break;
         case 'profile-edit':
             fillProfileEditForm();
             break;
@@ -1208,6 +1385,8 @@ function showScreen(screenId) {
 }
 
 function goBack() {
+    console.log('Нажата кнопка назад, текущий экран:', currentScreen);
+    
     switch(currentScreen) {
         case 'profile-edit':
             showScreen('profile');
@@ -1224,8 +1403,33 @@ function goBack() {
                 showScreen('workouts');
             }
             break;
+        case 'nutrition':
+        case 'progress':
+            showScreen('home');
+            break;
         default:
             showScreen('home');
+    }
+}
+
+function goHome() {
+    console.log('Нажата кнопка домой');
+    showScreen('home');
+}
+
+function updateNavigationButtons() {
+    const backButton = document.querySelector('.btn-back');
+    const homeButton = document.querySelector('.btn-home');
+    
+    // Всегда показываем кнопки на всех экранах, кроме главного
+    if (backButton && homeButton) {
+        if (currentScreen !== 'home' && currentScreen !== 'profile-setup') {
+            backButton.style.display = 'flex';
+            homeButton.style.display = 'flex';
+        } else {
+            backButton.style.display = 'none';
+            homeButton.style.display = 'none';
+        }
     }
 }
 
@@ -1329,8 +1533,8 @@ function setupWorkoutTimer() {
                 <div id="exercise-name" style="font-size: 1.5em; font-weight: 600; margin-bottom: 10px;">
                     Готовы начать?
                 </div>
-                <div id="exercise-info" style="color: #666; margin-bottom: 20px;">
-                    Всего упражнений: ${currentWorkout.exercises.length}
+                <div id="exercise-description" style="color: #666; margin-bottom: 20px; font-size: 0.95em; line-height: 1.4;">
+                    Нажмите "Начать тренировку"
                 </div>
                 <div id="set-info" style="color: #666; margin-bottom: 20px; display: none;">
                     Подход <span id="current-set">1</span> из <span id="total-sets">1</span>
@@ -1388,6 +1592,7 @@ function startTimer() {
     const startBtn = document.getElementById('start-timer-btn');
     const pauseBtn = document.getElementById('pause-btn');
     const setInfo = document.getElementById('set-info');
+    const exerciseDesc = document.getElementById('exercise-description');
     
     if (startBtn) startBtn.disabled = true;
     if (pauseBtn) pauseBtn.disabled = false;
@@ -1398,11 +1603,13 @@ function startTimer() {
     
     if (isResting) {
         document.getElementById('exercise-name').textContent = `Отдых после: ${exercise.name}`;
+        if (exerciseDesc) exerciseDesc.textContent = 'Восстановите дыхание и подготовьтесь к следующему подходу';
         workoutTimeLeft = exercise.rest;
         document.getElementById('exercise-status-' + currentExerciseIndex).textContent = `Отдых (${currentSet}/${totalSets})`;
         document.getElementById('exercise-status-' + currentExerciseIndex).style.color = '#4CD964';
     } else {
         document.getElementById('exercise-name').textContent = `${exercise.name} (${currentSet}/${totalSets})`;
+        if (exerciseDesc) exerciseDesc.textContent = exercise.description || 'Выполняйте упражнение с правильной техникой';
         workoutTimeLeft = exercise.duration;
         document.getElementById('exercise-status-' + currentExerciseIndex).textContent = `Выполняется (${currentSet}/${totalSets})`;
         document.getElementById('exercise-status-' + currentExerciseIndex).style.color = '#007AFF';
@@ -1510,7 +1717,14 @@ function completeWorkout() {
         currentUser.totalWorkouts = (currentUser.totalWorkouts || 0) + 1;
         currentUser.totalMinutes = (currentUser.totalMinutes || 0) + currentWorkout.duration;
         currentUser.totalCalories = (currentUser.totalCalories || 0) + currentWorkout.calories;
-        currentUser.streak = (currentUser.streak || 0) + 1;
+        
+        // Обновляем серию
+        const today = new Date().toISOString().split('T')[0];
+        if (currentUser.lastLogin !== today) {
+            currentUser.streak = (currentUser.streak || 0) + 1;
+            currentUser.lastLogin = today;
+        }
+        
         localStorage.setItem('fitnesspro_user', JSON.stringify(currentUser));
     }
     
@@ -1582,49 +1796,48 @@ function updateTodayPlan() {
     if (weeklyMeals[dayName]) {
         const meals = weeklyMeals[dayName];
         container.innerHTML = `
-            <div class="meal-item">
-                <div class="meal-time">
-                    <i class="fas fa-sun"></i>
-                    <span>${meals.breakfast.time} • Завтрак</span>
+            <div class="meal-item" style="background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px;">
+                <div class="meal-time" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i class="fas fa-sun" style="color: #FFC107;"></i>
+                    <span style="color: #666; font-size: 0.9em;">${meals.breakfast.time} • Завтрак</span>
                 </div>
-                <div class="meal-name">${meals.breakfast.name}</div>
-                <div class="meal-description">${meals.breakfast.description}</div>
-                <span class="meal-calories">${meals.breakfast.calories} ккал</span>
+                <div class="meal-name" style="font-weight: 600; margin-bottom: 5px;">${meals.breakfast.name}</div>
+                <div class="meal-description" style="color: #666; font-size: 0.85em; margin-bottom: 8px;">${meals.breakfast.description}</div>
+                <span class="meal-calories" style="background: #4CD964; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">${meals.breakfast.calories} ккал</span>
             </div>
             
-            <div class="meal-item">
-                <div class="meal-time">
-                    <i class="fas fa-utensils"></i>
-                    <span>${meals.lunch.time} • Обед</span>
+            <div class="meal-item" style="background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px;">
+                <div class="meal-time" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i class="fas fa-utensils" style="color: #4CAF50;"></i>
+                    <span style="color: #666; font-size: 0.9em;">${meals.lunch.time} • Обед</span>
                 </div>
-                <div class="meal-name">${meals.lunch.name}</div>
-                <div class="meal-description">${meals.lunch.description}</div>
-                <span class="meal-calories">${meals.lunch.calories} ккал</span>
+                <div class="meal-name" style="font-weight: 600; margin-bottom: 5px;">${meals.lunch.name}</div>
+                <div class="meal-description" style="color: #666; font-size: 0.85em; margin-bottom: 8px;">${meals.lunch.description}</div>
+                <span class="meal-calories" style="background: #4CD964; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">${meals.lunch.calories} ккал</span>
             </div>
             
-            <div class="meal-item">
-                <div class="meal-time">
-                    <i class="fas fa-moon"></i>
-                    <span>${meals.dinner.time} • Ужин</span>
+            <div class="meal-item" style="background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px;">
+                <div class="meal-time" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i class="fas fa-moon" style="color: #2196F3;"></i>
+                    <span style="color: #666; font-size: 0.9em;">${meals.dinner.time} • Ужин</span>
                 </div>
-                <div class="meal-name">${meals.dinner.name}</div>
-                <div class="meal-description">${meals.dinner.description}</div>
-                <span class="meal-calories">${meals.dinner.calories} ккал</span>
+                <div class="meal-name" style="font-weight: 600; margin-bottom: 5px;">${meals.dinner.name}</div>
+                <div class="meal-description" style="color: #666; font-size: 0.85em; margin-bottom: 8px;">${meals.dinner.description}</div>
+                <span class="meal-calories" style="background: #4CD964; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">${meals.dinner.calories} ккал</span>
             </div>
             
             ${meals.snacks && meals.snacks.length > 0 ? `
-                <div class="meal-item">
-                    <div class="meal-time">
-                        <i class="fas fa-apple-alt"></i>
-                        <span>Перекусы</span>
+                <div class="meal-item" style="background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px;">
+                    <div class="meal-time" style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <i class="fas fa-apple-alt" style="color: #FF5722;"></i>
+                        <span style="color: #666; font-size: 0.9em;">Перекусы</span>
                     </div>
-                    <div class="meal-name">${meals.snacks.map(s => `${s.time}: ${s.name}`).join(', ')}</div>
-                    <div class="meal-description">Всего перекусов: ${meals.snacks.length}</div>
-                    <span class="meal-calories">${meals.snacks.reduce((sum, s) => sum + s.calories, 0)} ккал</span>
+                    <div class="meal-name" style="font-weight: 600; margin-bottom: 5px;">${meals.snacks.map(s => `${s.time}: ${s.name}`).join(', ')}</div>
+                    <span class="meal-calories" style="background: #4CD964; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">${meals.snacks.reduce((sum, s) => sum + s.calories, 0)} ккал</span>
                 </div>
             ` : ''}
             
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #f0f0f0;">
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #f0f0f0;">
                 <div style="display: flex; justify-content: space-between; font-weight: 600; color: #007AFF;">
                     <span>Итого за день:</span>
                     <span>${meals.totalCalories} ккал</span>
@@ -1640,22 +1853,24 @@ function updateRecommendedWorkouts() {
     const container = document.getElementById('recommended-workouts');
     if (!container) return;
     
-    const recommended = [...homeWorkouts.slice(0, 2), ...gymWorkouts.slice(0, 1), ...restWorkouts.slice(0, 1)];
+    const recommended = [...homeWorkouts.slice(0, 3), ...gymWorkouts.slice(0, 1), ...restWorkouts.slice(0, 1)];
     
     container.innerHTML = recommended.map(workout => `
-        <div class="recommendation-item" onclick="showWorkoutDetail('${workout.id}')">
-            <div class="recommendation-info">
-                <h3>${workout.name}</h3>
-                <p>${workout.description}</p>
-                <div style="display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; color: #666;">
-                    <span>⏱ ${workout.duration} мин</span>
-                    <span>🔥 ${workout.calories} ккал</span>
-                    <span>${workout.difficulty}</span>
+        <div class="recommendation-item" onclick="showWorkoutDetail('${workout.id}')" style="background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <h3 style="color: #007AFF; margin-bottom: 5px; font-size: 1.1em;">${workout.name}</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">${workout.description}</p>
+                    <div style="display: flex; gap: 10px; margin-top: 5px; font-size: 0.85em; color: #666;">
+                        <span>⏱ ${workout.duration} мин</span>
+                        <span>🔥 ${workout.calories} ккал</span>
+                        <span>${workout.difficulty}</span>
+                    </div>
                 </div>
+                <button class="btn-small" onclick="event.stopPropagation(); startWorkout('${workout.id}')" style="background: #007AFF; color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.85em; cursor: pointer;">
+                    <i class="fas fa-play"></i> Начать
+                </button>
             </div>
-            <button class="btn-small" onclick="event.stopPropagation(); startWorkout('${workout.id}')">
-                <i class="fas fa-play"></i> Начать
-            </button>
         </div>
     `).join('');
 }
@@ -1683,10 +1898,6 @@ function createWorkoutDetailScreen() {
     detailScreen.id = 'workout-detail-screen';
     detailScreen.className = 'screen';
     detailScreen.innerHTML = `
-        <button class="btn-back" onclick="goBack()">
-            <i class="fas fa-arrow-left"></i>
-            <span>Назад</span>
-        </button>
         <div class="header">
             <div class="header-content">
                 <div>
@@ -1761,7 +1972,7 @@ function updateWorkoutDetail() {
                 </div>
             </div>
             
-            <h3 style="margin-bottom: 15px; color: #333;"><i class="fas fa-list-ol"></i> Упражнения:</h3>
+            <h3 style="margin-bottom: 15px; color: #333;"><i class="fas fa-list-ol"></i> Упражнения с описанием:</h3>
             <div style="background: #f8f9fa; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
                 ${currentWorkout.exercises.map((exercise, index) => `
                     <div style="padding: 15px 0; ${index < currentWorkout.exercises.length - 1 ? 'border-bottom: 1px solid #e0e0e0;' : ''}">
@@ -1771,7 +1982,10 @@ function updateWorkoutDetail() {
                                 display: flex; align-items: center; justify-content: center; 
                                 font-size: 0.9em; flex-shrink: 0;">${index + 1}</span>
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; margin-bottom: 5px;">${exercise.name}</div>
+                                <div style="font-weight: 600; margin-bottom: 5px; color: #333;">${exercise.name}</div>
+                                <div style="color: #666; font-size: 0.9em; margin-bottom: 8px;">
+                                    ${exercise.description || 'Выполняйте упражнение с правильной техникой'}
+                                </div>
                                 <div style="color: #666; font-size: 0.9em; display: flex; gap: 15px; flex-wrap: wrap;">
                                     <span><i class="fas fa-clock"></i> ${exercise.duration} сек</span>
                                     ${exercise.rest ? `<span><i class="fas fa-bed"></i> Отдых: ${exercise.rest} сек</span>` : ''}
@@ -1982,7 +2196,7 @@ function loadDiaryWorkouts() {
     const sortedWorkouts = [...diaryWorkouts].sort((a, b) => b.id - a.id);
     
     container.innerHTML = sortedWorkouts.map(workout => `
-        <div class="diary-item" onclick="showDiaryDetail(${workout.id})" style="padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer;">
+        <div class="diary-item" onclick="showDiaryDetail(${workout.id})" style="padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.3s ease;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #007AFF;">${workout.name}</h4>
                 <span style="font-size: 0.85em; color: #666;">${workout.date}</span>
@@ -2083,7 +2297,8 @@ function showNutritionTab(tab) {
     document.querySelectorAll('.nutrition-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nutrition-tab-content').forEach(c => c.classList.remove('active'));
     
-    event.target.classList.add('active');
+    const activeTab = event ? event.target : document.querySelector('.nutrition-tab.active');
+    if (activeTab) activeTab.classList.add('active');
     
     if (tab === 'week') {
         document.getElementById('week-plan').classList.add('active');
@@ -2091,8 +2306,11 @@ function showNutritionTab(tab) {
     } else if (tab === 'recipes') {
         document.getElementById('recipes-tab').classList.add('active');
         loadRecipes();
-    } else {
+    } else if (tab === 'calculator') {
         document.getElementById('bju-calculator').classList.add('active');
+    } else if (tab === 'custom') {
+        document.getElementById('custom-meals-tab').classList.add('active');
+        loadCustomMeals();
     }
 }
 
@@ -2105,7 +2323,8 @@ function showDayMeals(day) {
     if (!meals) return;
     
     document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    const activeBtn = document.querySelector(`.day-btn[onclick*="${day}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
     
     container.innerHTML = `
         <div style="text-align: center; margin-bottom: 20px;">
@@ -2319,17 +2538,419 @@ function calculateBJU() {
     result.style.display = 'block';
 }
 
-// ===== КНОПКА НАЗАД =====
-function updateBackButtonVisibility() {
-    const screensWithBack = ['profile-edit', 'diary-detail', 'workout-detail', 'workout-timer'];
-    const backButton = document.querySelector('.btn-back');
+// ===== ДОБАВЛЕНИЕ СВОЕГО БЛЮДА =====
+function showAddCustomMealModal() {
+    // Создаем модальное окно, если его нет
+    if (!document.getElementById('add-custom-meal-modal')) {
+        const modal = document.createElement('div');
+        modal.id = 'add-custom-meal-modal';
+        modal.className = 'modal';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title"><i class="fas fa-plus-circle"></i> Добавить свое блюдо</h2>
+                    <button class="modal-close" onclick="closeAddCustomMealModal()">×</button>
+                </div>
+                
+                <input type="text" id="custom-meal-name" class="form-input" placeholder="Название блюда" required>
+                
+                <select id="custom-meal-type" class="form-select" required>
+                    <option value="">Тип приема пищи</option>
+                    <option value="breakfast">Завтрак</option>
+                    <option value="lunch">Обед</option>
+                    <option value="dinner">Ужин</option>
+                    <option value="snack">Перекус</option>
+                </select>
+                
+                <div class="form-row">
+                    <input type="number" id="custom-meal-calories" class="form-input" placeholder="Калории" min="0" required>
+                    <input type="number" id="custom-meal-time" class="form-input" placeholder="Время (час)" min="0" max="23" value="12">
+                </div>
+                
+                <div class="form-row">
+                    <input type="number" id="custom-meal-proteins" class="form-input" placeholder="Белки (г)" min="0" step="0.1">
+                    <input type="number" id="custom-meal-fats" class="form-input" placeholder="Жиры (г)" min="0" step="0.1">
+                </div>
+                
+                <div class="form-row">
+                    <input type="number" id="custom-meal-carbs" class="form-input" placeholder="Углеводы (г)" min="0" step="0.1">
+                    <input type="number" id="custom-meal-weight" class="form-input" placeholder="Вес порции (г)" min="0">
+                </div>
+                
+                <textarea id="custom-meal-description" class="form-input" placeholder="Описание блюда (ингредиенты, способ приготовления)" rows="3"></textarea>
+                
+                <select id="custom-meal-day" class="form-select" required>
+                    <option value="">День недели</option>
+                    <option value="monday">Понедельник</option>
+                    <option value="tuesday">Вторник</option>
+                    <option value="wednesday">Среда</option>
+                    <option value="thursday">Четверг</option>
+                    <option value="friday">Пятница</option>
+                    <option value="saturday">Суббота</option>
+                    <option value="sunday">Воскресенье</option>
+                </select>
+                
+                <button class="btn-primary" onclick="saveCustomMeal()" style="width: 100%; margin-top: 20px;">
+                    <i class="fas fa-save"></i> Сохранить блюдо
+                </button>
+                
+                <button class="btn-secondary" onclick="closeAddCustomMealModal()" style="width: 100%; margin-top: 10px;">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
     
-    if (backButton) {
-        if (screensWithBack.includes(currentScreen)) {
-            backButton.style.display = 'flex';
-        } else {
-            backButton.style.display = 'none';
+    // Сбрасываем значения
+    document.getElementById('custom-meal-name').value = '';
+    document.getElementById('custom-meal-type').value = '';
+    document.getElementById('custom-meal-calories').value = '';
+    document.getElementById('custom-meal-time').value = '12';
+    document.getElementById('custom-meal-proteins').value = '';
+    document.getElementById('custom-meal-fats').value = '';
+    document.getElementById('custom-meal-carbs').value = '';
+    document.getElementById('custom-meal-weight').value = '';
+    document.getElementById('custom-meal-description').value = '';
+    document.getElementById('custom-meal-day').value = '';
+    
+    // Показываем модальное окно
+    document.getElementById('add-custom-meal-modal').style.display = 'flex';
+}
+
+function closeAddCustomMealModal() {
+    document.getElementById('add-custom-meal-modal').style.display = 'none';
+}
+
+function saveCustomMeal() {
+    const name = document.getElementById('custom-meal-name').value.trim();
+    const type = document.getElementById('custom-meal-type').value;
+    const calories = parseInt(document.getElementById('custom-meal-calories').value) || 0;
+    const time = parseInt(document.getElementById('custom-meal-time').value) || 12;
+    const proteins = parseFloat(document.getElementById('custom-meal-proteins').value) || 0;
+    const fats = parseFloat(document.getElementById('custom-meal-fats').value) || 0;
+    const carbs = parseFloat(document.getElementById('custom-meal-carbs').value) || 0;
+    const weight = parseInt(document.getElementById('custom-meal-weight').value) || 0;
+    const description = document.getElementById('custom-meal-description').value.trim();
+    const day = document.getElementById('custom-meal-day').value;
+    
+    if (!name) {
+        showNotification('Введите название блюда');
+        return;
+    }
+    
+    if (!type) {
+        showNotification('Выберите тип приема пищи');
+        return;
+    }
+    
+    if (!calories || calories <= 0) {
+        showNotification('Введите калорийность блюда');
+        return;
+    }
+    
+    if (!day) {
+        showNotification('Выберите день недели');
+        return;
+    }
+    
+    const customMeal = {
+        id: Date.now(),
+        name: name,
+        type: type,
+        calories: calories,
+        time: time + ':00',
+        proteins: proteins,
+        fats: fats,
+        carbs: carbs,
+        weight: weight,
+        description: description,
+        day: day,
+        createdAt: new Date().toISOString()
+    };
+    
+    customMeals.push(customMeal);
+    localStorage.setItem('fitnesspro_custom_meals', JSON.stringify(customMeals));
+    
+    closeAddCustomMealModal();
+    showNotification(`Блюдо "${name}" успешно добавлено! 🍽️`);
+    
+    if (currentScreen === 'nutrition') {
+        loadCustomMeals();
+    }
+}
+
+function loadCustomMeals() {
+    const container = document.getElementById('custom-meals-list');
+    if (!container) return;
+    
+    if (customMeals.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #666;">
+                <i class="fas fa-utensils" style="font-size: 3em; margin-bottom: 20px; color: #e0e0e0;"></i>
+                <h3 style="margin-bottom: 10px;">Свои блюда не добавлены</h3>
+                <p>Добавьте свое первое блюдо!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const sortedMeals = [...customMeals].sort((a, b) => b.id - a.id);
+    
+    container.innerHTML = sortedMeals.map(meal => `
+        <div style="background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <h4 style="color: #007AFF; margin-bottom: 5px;">${meal.name}</h4>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <span style="background: #f0f0f0; padding: 3px 8px; border-radius: 12px; font-size: 0.85em;">
+                            ${meal.type === 'breakfast' ? 'Завтрак' : 
+                              meal.type === 'lunch' ? 'Обед' : 
+                              meal.type === 'dinner' ? 'Ужин' : 'Перекус'}
+                        </span>
+                        <span style="background: #f0f0f0; padding: 3px 8px; border-radius: 12px; font-size: 0.85em;">
+                            ${meal.day === 'monday' ? 'Пн' : 
+                             meal.day === 'tuesday' ? 'Вт' : 
+                             meal.day === 'wednesday' ? 'Ср' : 
+                             meal.day === 'thursday' ? 'Чт' : 
+                             meal.day === 'friday' ? 'Пт' : 
+                             meal.day === 'saturday' ? 'Сб' : 'Вс'}
+                        </span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 1.5em; font-weight: 700; color: #4CD964;">${meal.calories}</div>
+                    <div style="color: #666; font-size: 0.85em;">ккал</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                ${meal.proteins > 0 ? `<span style="background: #e3f2fd; color: #1976d2; padding: 5px 10px; border-radius: 15px; font-size: 0.85em;">Б: ${meal.proteins}г</span>` : ''}
+                ${meal.fats > 0 ? `<span style="background: #e8f5e9; color: #388e3c; padding: 5px 10px; border-radius: 15px; font-size: 0.85em;">Ж: ${meal.fats}г</span>` : ''}
+                ${meal.carbs > 0 ? `<span style="background: #fff3e0; color: #f57c00; padding: 5px 10px; border-radius: 15px; font-size: 0.85em;">У: ${meal.carbs}г</span>` : ''}
+                ${meal.weight > 0 ? `<span style="background: #f3e5f5; color: #7b1fa2; padding: 5px 10px; border-radius: 15px; font-size: 0.85em;">${meal.weight}г</span>` : ''}
+                <span style="background: #e0f2f1; color: #00695c; padding: 5px 10px; border-radius: 15px; font-size: 0.85em;">${meal.time}</span>
+            </div>
+            
+            ${meal.description ? `
+                <div style="background: #f8f9fa; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                    <p style="color: #333; margin: 0; line-height: 1.5;">${meal.description}</p>
+                </div>
+            ` : ''}
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-small" onclick="editCustomMeal(${meal.id})" style="flex: 1; background: #007AFF; color: white; border: none; padding: 10px; border-radius: 12px; cursor: pointer;">
+                    <i class="fas fa-edit"></i> Редактировать
+                </button>
+                <button class="btn-small" onclick="deleteCustomMeal(${meal.id})" style="flex: 1; background: #FF3B30; color: white; border: none; padding: 10px; border-radius: 12px; cursor: pointer;">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function editCustomMeal(mealId) {
+    const meal = customMeals.find(m => m.id === mealId);
+    if (!meal) return;
+    
+    document.getElementById('custom-meal-name').value = meal.name;
+    document.getElementById('custom-meal-type').value = meal.type;
+    document.getElementById('custom-meal-calories').value = meal.calories;
+    document.getElementById('custom-meal-time').value = parseInt(meal.time.split(':')[0]);
+    document.getElementById('custom-meal-proteins').value = meal.proteins;
+    document.getElementById('custom-meal-fats').value = meal.fats;
+    document.getElementById('custom-meal-carbs').value = meal.carbs;
+    document.getElementById('custom-meal-weight').value = meal.weight;
+    document.getElementById('custom-meal-description').value = meal.description;
+    document.getElementById('custom-meal-day').value = meal.day;
+    
+    showAddCustomMealModal();
+    
+    const saveBtn = document.querySelector('#add-custom-meal-modal .btn-primary');
+    saveBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Обновить блюдо';
+    saveBtn.onclick = function() { updateCustomMeal(mealId); };
+}
+
+function updateCustomMeal(mealId) {
+    const name = document.getElementById('custom-meal-name').value.trim();
+    const type = document.getElementById('custom-meal-type').value;
+    const calories = parseInt(document.getElementById('custom-meal-calories').value) || 0;
+    const time = parseInt(document.getElementById('custom-meal-time').value) || 12;
+    const proteins = parseFloat(document.getElementById('custom-meal-proteins').value) || 0;
+    const fats = parseFloat(document.getElementById('custom-meal-fats').value) || 0;
+    const carbs = parseFloat(document.getElementById('custom-meal-carbs').value) || 0;
+    const weight = parseInt(document.getElementById('custom-meal-weight').value) || 0;
+    const description = document.getElementById('custom-meal-description').value.trim();
+    const day = document.getElementById('custom-meal-day').value;
+    
+    if (!name) {
+        showNotification('Введите название блюда');
+        return;
+    }
+    
+    if (!type) {
+        showNotification('Выберите тип приема пищи');
+        return;
+    }
+    
+    if (!calories || calories <= 0) {
+        showNotification('Введите калорийность блюда');
+        return;
+    }
+    
+    if (!day) {
+        showNotification('Выберите день недели');
+        return;
+    }
+    
+    const index = customMeals.findIndex(m => m.id === mealId);
+    if (index !== -1) {
+        customMeals[index] = {
+            ...customMeals[index],
+            name: name,
+            type: type,
+            calories: calories,
+            time: time + ':00',
+            proteins: proteins,
+            fats: fats,
+            carbs: carbs,
+            weight: weight,
+            description: description,
+            day: day,
+            updatedAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('fitnesspro_custom_meals', JSON.stringify(customMeals));
+        closeAddCustomMealModal();
+        showNotification(`Блюдо "${name}" обновлено! ✅`);
+        loadCustomMeals();
+    }
+}
+
+function deleteCustomMeal(mealId) {
+    if (confirm('Вы уверены, что хотите удалить это блюдо?')) {
+        const index = customMeals.findIndex(m => m.id === mealId);
+        if (index !== -1) {
+            customMeals.splice(index, 1);
+            localStorage.setItem('fitnesspro_custom_meals', JSON.stringify(customMeals));
+            showNotification('Блюдо удалено');
+            loadCustomMeals();
         }
+    }
+}
+
+// ===== УВЕДОМЛЕНИЯ =====
+function showNotification(message) {
+    let notification = document.querySelector('.notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    notification.textContent = message;
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// ===== ДРУГИЕ ФУНКЦИИ =====
+function logout() {
+    if (confirm('Вы уверены, что хотите сбросить профиль? Все данные будут удалены.')) {
+        localStorage.removeItem('fitnesspro_user');
+        localStorage.removeItem('fitnesspro_diary');
+        localStorage.removeItem('fitnesspro_water');
+        localStorage.removeItem('fitnesspro_custom_meals');
+        
+        currentUser = null;
+        diaryWorkouts = [];
+        customMeals = [];
+        waterIntake = 0;
+        
+        showScreen('profile-setup');
+        showNotification('Профиль сброшен. Создайте новый профиль.');
+    }
+}
+
+function selectGender(gender) {
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function calculateCalories() {
+    const age = parseInt(document.getElementById('calc-age').value) || 25;
+    const height = parseInt(document.getElementById('calc-height').value) || 175;
+    const weight = parseInt(document.getElementById('calc-weight').value) || 70;
+    const activity = parseFloat(document.getElementById('calc-activity').value) || 1.55;
+    const goal = document.getElementById('calc-goal').value;
+    
+    // Формула Миффлина-Сан Жеора (упрощенная)
+    let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    let tdee = bmr * activity;
+    
+    // Корректировка по цели
+    if (goal === 'loss') {
+        tdee *= 0.8; // -20%
+    } else if (goal === 'gain') {
+        tdee *= 1.2; // +20%
+    }
+    
+    const result = document.getElementById('calorie-result');
+    result.innerHTML = `
+        <h4 style="margin-bottom: 15px; color: #007AFF;">Результаты расчета:</h4>
+        <div style="background: #f0f8ff; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+            <div style="font-size: 2.5em; font-weight: 800; color: #007AFF; text-align: center;">${Math.round(tdee)}</div>
+            <div style="color: #007AFF; font-weight: 600; text-align: center; margin-top: 10px;">ккал в день</div>
+        </div>
+        <p style="color: #666; font-size: 0.9em; text-align: center;">
+            ${goal === 'loss' ? 'Для похудения' : goal === 'gain' ? 'Для набора массы' : 'Для поддержания веса'}
+        </p>
+    `;
+    result.style.display = 'block';
+}
+
+function updateProfileScreen() {
+    if (!currentUser) return;
+    
+    document.getElementById('profile-name').textContent = currentUser.name;
+    document.getElementById('profile-goal').textContent = getGoalText(currentUser.goal);
+    document.getElementById('profile-age').textContent = currentUser.age + ' лет';
+    document.getElementById('profile-gender').textContent = currentUser.gender === 'male' ? 'Мужской' : 'Женский';
+    document.getElementById('profile-weight').textContent = currentUser.weight + ' кг';
+    document.getElementById('profile-height').textContent = currentUser.height + ' см';
+    
+    const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    document.getElementById('profile-initials').textContent = initials || 'И';
+}
+
+function getGoalText(goal) {
+    switch(goal) {
+        case 'weight_loss': return 'Похудение';
+        case 'muscle_gain': return 'Набор мышечной массы';
+        case 'maintenance': return 'Поддержание формы';
+        case 'endurance': return 'Развитие выносливости';
+        case 'strength': return 'Развитие силы';
+        default: return 'Не указана';
+    }
+}
+
+function updateProgressScreen() {
+    if (!currentUser) return;
+    
+    document.getElementById('total-workouts').textContent = currentUser.totalWorkouts || 0;
+    document.getElementById('total-hours').textContent = Math.round((currentUser.totalMinutes || 0) / 60);
+    document.getElementById('total-calories-burned').textContent = currentUser.totalCalories || 0;
+    document.getElementById('current-streak').textContent = currentUser.streak || 0;
+    
+    const chart = document.getElementById('activity-chart');
+    if (chart) {
+        chart.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">График активности</p>';
     }
 }
 
@@ -2337,25 +2958,18 @@ function updateBackButtonVisibility() {
 function initApp() {
     console.log('Инициализация приложения...');
     
+    // Загружаем пользователя
     const savedUser = localStorage.getItem('fitnesspro_user');
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
             console.log('Пользователь загружен:', currentUser.name);
-            if (currentUser && currentUser.name) {
-                showScreen('home');
-            } else {
-                showScreen('profile-setup');
-            }
         } catch (error) {
             console.error('Ошибка при загрузке пользователя:', error);
-            showScreen('profile-setup');
         }
-    } else {
-        console.log('Пользователь не найден, показываем экран настройки');
-        showScreen('profile-setup');
     }
     
+    // Загружаем дневник тренировок
     const savedDiary = localStorage.getItem('fitnesspro_diary');
     if (savedDiary) {
         try {
@@ -2363,20 +2977,31 @@ function initApp() {
             console.log('Дневник загружен, записей:', diaryWorkouts.length);
         } catch (error) {
             console.error('Ошибка при загрузке дневника:', error);
-            diaryWorkouts = [];
         }
     }
     
+    // Загружаем водный баланс
     const savedWater = localStorage.getItem('fitnesspro_water');
     if (savedWater) {
         try {
             waterIntake = parseInt(savedWater) || 0;
         } catch (error) {
             console.error('Ошибка при загрузке водного баланса:', error);
-            waterIntake = 0;
         }
     }
     
+    // Загружаем свои блюда
+    const savedCustomMeals = localStorage.getItem('fitnesspro_custom_meals');
+    if (savedCustomMeals) {
+        try {
+            customMeals = JSON.parse(savedCustomMeals);
+            console.log('Свои блюда загружены, записей:', customMeals.length);
+        } catch (error) {
+            console.error('Ошибка при загрузке своих блюд:', error);
+        }
+    }
+    
+    // Устанавливаем текущую дату
     const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const dateElement = document.getElementById('current-date');
@@ -2384,9 +3009,24 @@ function initApp() {
         dateElement.textContent = now.toLocaleDateString('ru-RU', options);
     }
     
+    // Создаем уведомление
+    if (!document.querySelector('.notification')) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    // Показываем нужный экран
+    if (currentUser && currentUser.name) {
+        showScreen('home');
+    } else {
+        showScreen('profile-setup');
+    }
+    
     console.log('Инициализация завершена');
 }
 
+// Запуск приложения при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM загружен');
     initApp();
