@@ -46,6 +46,12 @@
         <span>Назад</span>
     </button>
 
+    <!-- Кнопка Домой (для экранов без навигации) -->
+    <button class="btn-home" onclick="goHome()" style="display: none;">
+        <i class="fas fa-home"></i>
+        <span>Домой</span>
+    </button>
+
     <!-- Экран настройки профиля -->
     <div id="profile-setup-screen" class="screen active">
         <div class="auth-container">
@@ -197,9 +203,9 @@
                 <i class="fas fa-book"></i>
                 <span>Дневник</span>
             </a>
-            <a href="#" class="nav-item" onclick="showScreen('progress'); return false;">
-                <i class="fas fa-chart-line"></i>
-                <span>Прогресс</span>
+            <a href="#" class="nav-item" onclick="showScreen('nutrition'); return false;">
+                <i class="fas fa-utensils"></i>
+                <span>Питание</span>
             </a>
             <a href="#" class="nav-item" onclick="showScreen('profile'); return false;">
                 <i class="fas fa-user"></i>
@@ -213,7 +219,7 @@
         <div class="header">
             <div class="header-content">
                 <div>
-                    <h1><i class="fas fa-dumbbell"></i> 32 тренировки</h1>
+                    <h1><i class="fas fa-dumbbell"></i> Тренировки</h1>
                     <p>С таймерами и отдыхом между подходами</p>
                 </div>
             </div>
@@ -223,10 +229,10 @@
             <!-- Фильтры тренировок -->
             <div class="workout-filters">
                 <button class="filter-btn active" onclick="loadWorkoutsList('all')">Все (32)</button>
-                <button class="filter-btn" onclick="loadWorkoutsList('home')">Домашние (5)</button>
-                <button class="filter-btn" onclick="loadWorkoutsList('gym')">Зал (2)</button>
-                <button class="filter-btn" onclick="loadWorkoutsList('cardio')">Кардио (2)</button>
-                <button class="filter-btn" onclick="loadWorkoutsList('rest')">Отдых (2)</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('home')">Домашние</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('gym')">Зал</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('cardio')">Кардио</button>
+                <button class="filter-btn" onclick="loadWorkoutsList('rest')">Отдых</button>
             </div>
             
             <!-- Список тренировок -->
@@ -299,6 +305,7 @@
                 <button class="nutrition-tab active" onclick="showNutritionTab('week')">Неделя</button>
                 <button class="nutrition-tab" onclick="showNutritionTab('recipes')">Рецепты</button>
                 <button class="nutrition-tab" onclick="showNutritionTab('calculator')">Калькулятор БЖУ</button>
+                <button class="nutrition-tab" onclick="showNutritionTab('custom')">Мои блюда</button>
             </div>
             
             <!-- Контент питания -->
@@ -341,59 +348,19 @@
                         <div id="bju-result" class="result-card" style="display: none;"></div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Экран калькулятора -->
-    <div id="calculator-screen" class="screen">
-        <div class="header">
-            <div class="header-content">
-                <div>
-                    <h1><i class="fas fa-calculator"></i> Калькулятор</h1>
-                    <p>Рассчитайте ваши нормы</p>
+                
+                <!-- Мои блюда -->
+                <div id="custom-meals-tab" class="nutrition-tab-content">
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn-primary" onclick="showAddCustomMealModal()" style="width: 100%;">
+                            <i class="fas fa-plus"></i> Добавить свое блюдо
+                        </button>
+                    </div>
+                    
+                    <div id="custom-meals-list">
+                        <!-- Мои блюда загрузятся динамически -->
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="main-content">
-            <div class="calculator-card">
-                <h2><i class="fas fa-fire"></i> Калькулятор калорий</h2>
-                
-                <div class="gender-select">
-                    <button class="gender-btn active" onclick="selectGender('male')">Мужчина</button>
-                    <button class="gender-btn" onclick="selectGender('female')">Женщина</button>
-                </div>
-                
-                <div class="form-row">
-                    <input type="number" id="calc-age" class="form-input" placeholder="Возраст" value="25">
-                    <input type="number" id="calc-height" class="form-input" placeholder="Рост, см" value="175">
-                </div>
-                
-                <input type="number" id="calc-weight" class="form-input" placeholder="Вес, кг" value="70">
-                
-                <select id="calc-activity" class="form-select">
-                    <option value="1.2">Сидячий образ жизни</option>
-                    <option value="1.375">Легкая активность (1-3 тренировки)</option>
-                    <option value="1.55" selected>Умеренная активность (3-5 тренировок)</option>
-                    <option value="1.725">Высокая активность (6-7 тренировок)</option>
-                    <option value="1.9">Экстремальная активность</option>
-                </select>
-                
-                <select id="calc-goal" class="form-select">
-                    <option value="loss">Похудение (-20%)</option>
-                    <option value="maintenance">Поддержание веса</option>
-                    <option value="gain">Набор массы (+20%)</option>
-                </select>
-                
-                <button class="btn-primary" onclick="calculateCalories()">Рассчитать калории</button>
-                
-                <div id="calorie-result" class="result-card" style="display: none;"></div>
-            </div>
-            
-            <div class="history-card">
-                <h3><i class="fas fa-history"></i> История расчетов</h3>
-                <div id="calculation-history"></div>
             </div>
         </div>
     </div>
@@ -640,6 +607,62 @@
         </div>
     </div>
 
+    <!-- Модальное окно для добавления своего блюда -->
+    <div id="add-custom-meal-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-plus-circle"></i> Добавить свое блюдо</h2>
+                <button class="modal-close" onclick="closeAddCustomMealModal()">×</button>
+            </div>
+            
+            <input type="text" id="custom-meal-name" class="form-input" placeholder="Название блюда" required>
+            
+            <select id="custom-meal-type" class="form-select" required>
+                <option value="">Тип приема пищи</option>
+                <option value="breakfast">Завтрак</option>
+                <option value="lunch">Обед</option>
+                <option value="dinner">Ужин</option>
+                <option value="snack">Перекус</option>
+            </select>
+            
+            <div class="form-row">
+                <input type="number" id="custom-meal-calories" class="form-input" placeholder="Калории" min="0" required>
+                <input type="number" id="custom-meal-time" class="form-input" placeholder="Время (час)" min="0" max="23" value="12">
+            </div>
+            
+            <div class="form-row">
+                <input type="number" id="custom-meal-proteins" class="form-input" placeholder="Белки (г)" min="0" step="0.1">
+                <input type="number" id="custom-meal-fats" class="form-input" placeholder="Жиры (г)" min="0" step="0.1">
+            </div>
+            
+            <div class="form-row">
+                <input type="number" id="custom-meal-carbs" class="form-input" placeholder="Углеводы (г)" min="0" step="0.1">
+                <input type="number" id="custom-meal-weight" class="form-input" placeholder="Вес порции (г)" min="0">
+            </div>
+            
+            <textarea id="custom-meal-description" class="form-input" placeholder="Описание блюда (ингредиенты, способ приготовления)" rows="3"></textarea>
+            
+            <select id="custom-meal-day" class="form-select" required>
+                <option value="">День недели</option>
+                <option value="monday">Понедельник</option>
+                <option value="tuesday">Вторник</option>
+                <option value="wednesday">Среда</option>
+                <option value="thursday">Четверг</option>
+                <option value="friday">Пятница</option>
+                <option value="saturday">Суббота</option>
+                <option value="sunday">Воскресенье</option>
+            </select>
+            
+            <button class="btn-primary" onclick="saveCustomMeal()" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-save"></i> Сохранить блюдо
+            </button>
+            
+            <button class="btn-secondary" onclick="closeAddCustomMealModal()" style="width: 100%; margin-top: 10px;">
+                <i class="fas fa-times"></i> Отмена
+            </button>
+        </div>
+    </div>
+
     <!-- Детали тренировки из дневника -->
     <div id="diary-detail-screen" class="screen">
         <div class="header">
@@ -655,6 +678,22 @@
         
         <div class="main-content">
             <div id="diary-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- Детали тренировки -->
+    <div id="workout-detail-screen" class="screen">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-dumbbell"></i> Тренировка</h1>
+                    <p id="detail-workout-name"></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="workout-detail-content"></div>
         </div>
     </div>
 
